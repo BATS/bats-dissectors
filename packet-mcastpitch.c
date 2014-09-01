@@ -1,8 +1,6 @@
 /* packet-mcastpitch.c
  * Routines for BATS Multicast PITCH.
- * Copyright 2010-2014, Eric Crampton <ecrampton@batstrading.com>
- *
- * $Id$
+ * Copyright 2010-2014, Eric Crampton
  *
  * Wireshark - Network traffic analyzer
  * By Gerald Combs <gerald@wireshark.org>
