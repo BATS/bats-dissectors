@@ -71,7 +71,7 @@ static int hf_mcastpitch_session_sub_id        = -1;
 static int hf_mcastpitch_username              = -1;
 static int hf_mcastpitch_filler                = -1;
 static int hf_mcastpitch_password              = -1;
-static int hf_mcastpitch_login_response_type   = -1;
+static int hf_mcastpitch_login_status          = -1;
 static int hf_mcastpitch_halt_status           = -1;
 static int hf_mcastpitch_reg_sho_action        = -1;
 static int hf_mcastpitch_reserved1             = -1;
@@ -158,6 +158,14 @@ static const gint AUCTION_SUMMARY_MESSAGE_LEN              = 27;
 static const gint UNIT_CLEAR_MESSAGE_LEN                   = 6;
 static const gint LATENCY_STAT_MESSAGE_LEN                 = 112;
 static const gint STATISTICS_MESSAGE_LEN                   = 24;
+
+static const value_string login_response_status[] = {
+    { 'A', "'A' Login Accepted" },
+    { 'N', "'N' Not Authorized (Invalid Username/Password)" },
+    { 'B', "'B' Session in Use" },
+    { 'S', "'S' Invalid Session" },
+    { 0, NULL },
+};
 
 static const value_string mcastPitchAuctionTypes[] = {
     { 'O', "Opening Auction" },
@@ -319,9 +327,9 @@ dissect_login_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
 
     m_tree = proto_item_add_subtree(m_item, ett_mcastpitch);
 
-    proto_tree_add_item(m_tree, hf_mcastpitch_msg_length,          tvb, *offset,      1, TRUE);
-    proto_tree_add_item(m_tree, hf_mcastpitch_msg_type,            tvb, *offset + 1,  1, TRUE);
-    proto_tree_add_item(m_tree, hf_mcastpitch_login_response_type, tvb, *offset + 2,  1, TRUE);
+    proto_tree_add_item(m_tree, hf_mcastpitch_msg_length,   tvb, *offset,      1, TRUE);
+    proto_tree_add_item(m_tree, hf_mcastpitch_msg_type,     tvb, *offset + 1,  1, TRUE);
+    proto_tree_add_item(m_tree, hf_mcastpitch_login_status, tvb, *offset + 2,  1, TRUE);
     
     *offset = *offset + LOGIN_RESPONSE_MESSAGE_LEN;
 
@@ -1308,7 +1316,6 @@ mcp_analysis_get_conversation_data(packet_info *pinfo)
         /* New conversation, initialise analysis data */
         conv = conversation_new(pinfo->fd->num, &pinfo->src, &pinfo->dst, pinfo->ptype, pinfo->srcport, pinfo->destport, 0);
         mcpa = (mcp_analysis_t *)wmem_alloc(wmem_file_scope(), sizeof(mcp_analysis_t));
-        printf("allocated mcpa=%p\n", mcpa);
         mcpa->next_sequence = 0;
         mcpa->fd = NULL;
         mcpa->frame_table = wmem_tree_new(wmem_file_scope());
@@ -1319,15 +1326,12 @@ mcp_analysis_get_conversation_data(packet_info *pinfo)
         mcpa = (mcp_analysis_t *)conversation_get_proto_data(conv, proto_mcastpitch);
         if (!mcpa) {
             mcpa = (mcp_analysis_t *)wmem_alloc(wmem_file_scope(), sizeof(mcp_analysis_t));
-            printf("allocated mcpa=%p\n", mcpa);
             mcpa->next_sequence = 0;
             mcpa->fd = NULL;
             mcpa->frame_table = wmem_tree_new(wmem_file_scope());
             conversation_add_proto_data(conv, proto_mcastpitch, (void *)mcpa);
         }
     }
-
-    printf("returning mcpa=%p\n", mcpa);
 
     return mcpa;
 }
@@ -1663,7 +1667,7 @@ proto_register_mcastpitch(void)
             { &hf_mcastpitch_username,              { "Username",                "mcastpitch.username",            FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
             { &hf_mcastpitch_filler,                { "Filler",                  "mcastpitch.filler",              FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
             { &hf_mcastpitch_password,              { "Password",                "mcastpitch.password",            FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_login_response_type,   { "Login Response Type",     "mcastpitch.login_response_type", FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
+            { &hf_mcastpitch_login_status,          { "Login Status",            "mcastpitch.login_status",        FT_UINT8,  BASE_HEX,     login_response_status, 0x0, NULL, HFILL } },
             { &hf_mcastpitch_halt_status,           { "Halt Status",             "mcastpitch.halt_status",         FT_UINT8,  BASE_DEC,     mcastPitchTradingStatusTypes, 0x0, NULL, HFILL } },
             { &hf_mcastpitch_reg_sho_action,        { "Reg SHO Action",          "mcastpitch.reg_sho_action",      FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
             { &hf_mcastpitch_reserved1,             { "Reserved 1",              "mcastpitch.reserved1",           FT_UINT8,  BASE_HEX,     NULL, 0x0, NULL, HFILL } }, 
