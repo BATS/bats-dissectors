@@ -42,122 +42,127 @@
 int proto_mcastpitch = -1;
 static dissector_handle_t mcastpitch_handle;
 
-static int hf_mcastpitch_hdr_length            = -1;
-static int hf_mcastpitch_hdr_count             = -1;
-static int hf_mcastpitch_hdr_unit              = -1;
-static int hf_mcastpitch_hdr_sequence          = -1;
-static int hf_mcastpitch_msg_length            = -1;
-static int hf_mcastpitch_msg_type              = -1;
-static int hf_mcastpitch_time                  = -1;
-static int hf_mcastpitch_time_offset           = -1;
-static int hf_mcastpitch_order_id              = -1;
-static int hf_mcastpitch_side                  = -1;
-static int hf_mcastpitch_long_quantity         = -1;
-static int hf_mcastpitch_quantity8             = -1;
-static int hf_mcastpitch_symbol6               = -1;
-static int hf_mcastpitch_long_price            = -1;
-static int hf_mcastpitch_short_quantity        = -1;
-static int hf_mcastpitch_short_price           = -1;
-static int hf_mcastpitch_executed_shares       = -1;
-static int hf_mcastpitch_execution_id          = -1;
-static int hf_mcastpitch_trade_id              = -1;
-static int hf_mcastpitch_remaining_shares      = -1;
-static int hf_mcastpitch_long_canceled_shares  = -1;
-static int hf_mcastpitch_short_canceled_shares = -1;
-static int hf_mcastpitch_symbol8               = -1;
-static int hf_mcastpitch_add_flags             = -1;
-static int hf_mcastpitch_osi_symbol            = -1;
-static int hf_mcastpitch_session_sub_id        = -1;
-static int hf_mcastpitch_username              = -1;
-static int hf_mcastpitch_filler                = -1;
-static int hf_mcastpitch_password              = -1;
-static int hf_mcastpitch_login_status          = -1;
-static int hf_mcastpitch_halt_status           = -1;
-static int hf_mcastpitch_reg_sho_action        = -1;
-static int hf_mcastpitch_reserved1             = -1;
-static int hf_mcastpitch_reserved2             = -1;
-static int hf_mcastpitch_auction_type          = -1;
-static int hf_mcastpitch_reference_price       = -1;
-static int hf_mcastpitch_buy_shares            = -1;
-static int hf_mcastpitch_sell_shares           = -1;
-static int hf_mcastpitch_indicative_price      = -1;
-static int hf_mcastpitch_auction_only_price    = -1;
-static int hf_mcastpitch_sequence              = -1;
-static int hf_mcastpitch_order_count           = -1;
-static int hf_mcastpitch_status                = -1;
-static int hf_mcastpitch_unit                  = -1;
-static int hf_mcastpitch_count                 = -1;
-static int hf_mcastpitch_measurement_type      = -1;
-static int hf_mcastpitch_begin_time            = -1;
-static int hf_mcastpitch_end_time              = -1;
-static int hf_mcastpitch_minimum               = -1;
-static int hf_mcastpitch_maximum               = -1;
-static int hf_mcastpitch_average               = -1;
-static int hf_mcastpitch_standard_deviation    = -1;
-static int hf_mcastpitch_mode                  = -1;
-static int hf_mcastpitch_99_9_percentile       = -1;
-static int hf_mcastpitch_99_percentile         = -1;
-static int hf_mcastpitch_95_percentile         = -1;
-static int hf_mcastpitch_90_percentile         = -1;
-static int hf_mcastpitch_75_percentile         = -1;
-static int hf_mcastpitch_50_percentile         = -1;
-static int hf_mcastpitch_25_percentile         = -1;
-static int hf_mcastpitch_trade_time            = -1;
-static int hf_mcastpitch_exec_venue            = -1;
-static int hf_mcastpitch_traded_currency       = -1;
-static int hf_mcastpitch_trade_report_flags    = -1;
-static int hf_mcastpitch_participant_id        = -1;
-static int hf_mcastpitch_trade_flags           = -1;
-static int hf_mcastpitch_execution_flags       = -1;
-static int hf_mcastpitch_statistic_type        = -1;
-static int hf_mcastpitch_price_determination   = -1;
+static int hf_mcastpitch_hdr_length               = -1;
+static int hf_mcastpitch_hdr_count                = -1;
+static int hf_mcastpitch_hdr_unit                 = -1;
+static int hf_mcastpitch_hdr_sequence             = -1;
+static int hf_mcastpitch_msg_length               = -1;
+static int hf_mcastpitch_msg_type                 = -1;
+static int hf_mcastpitch_time                     = -1;
+static int hf_mcastpitch_time_offset              = -1;
+static int hf_mcastpitch_order_id                 = -1;
+static int hf_mcastpitch_side                     = -1;
+static int hf_mcastpitch_long_quantity            = -1;
+static int hf_mcastpitch_quantity8                = -1;
+static int hf_mcastpitch_symbol6                  = -1;
+static int hf_mcastpitch_long_price               = -1;
+static int hf_mcastpitch_short_quantity           = -1;
+static int hf_mcastpitch_short_price              = -1;
+static int hf_mcastpitch_executed_shares          = -1;
+static int hf_mcastpitch_execution_id             = -1;
+static int hf_mcastpitch_trade_id                 = -1;
+static int hf_mcastpitch_remaining_shares         = -1;
+static int hf_mcastpitch_long_canceled_shares     = -1;
+static int hf_mcastpitch_short_canceled_shares    = -1;
+static int hf_mcastpitch_symbol8                  = -1;
+static int hf_mcastpitch_add_flags                = -1;
+static int hf_mcastpitch_osi_symbol               = -1;
+static int hf_mcastpitch_session_sub_id           = -1;
+static int hf_mcastpitch_username                 = -1;
+static int hf_mcastpitch_filler                   = -1;
+static int hf_mcastpitch_password                 = -1;
+static int hf_mcastpitch_login_status             = -1;
+static int hf_mcastpitch_trading_status           = -1;
+static int hf_mcastpitch_options_symbol_condition = -1;
+static int hf_mcastpitch_reg_sho_action           = -1;
+static int hf_mcastpitch_retail_price_improvement = -1;
+static int hf_mcastpitch_reserved1                = -1;
+static int hf_mcastpitch_reserved2                = -1;
+static int hf_mcastpitch_auction_type             = -1;
+static int hf_mcastpitch_reference_price          = -1;
+static int hf_mcastpitch_buy_shares               = -1;
+static int hf_mcastpitch_sell_shares              = -1;
+static int hf_mcastpitch_indicative_price         = -1;
+static int hf_mcastpitch_auction_only_price       = -1;
+static int hf_mcastpitch_sequence                 = -1;
+static int hf_mcastpitch_order_count              = -1;
+static int hf_mcastpitch_gap_response_status      = -1;
+static int hf_mcastpitch_spin_response_status     = -1;
+static int hf_mcastpitch_status                   = -1;
+static int hf_mcastpitch_unit                     = -1;
+static int hf_mcastpitch_count                    = -1;
+static int hf_mcastpitch_measurement_type         = -1;
+static int hf_mcastpitch_begin_time               = -1;
+static int hf_mcastpitch_end_time                 = -1;
+static int hf_mcastpitch_minimum                  = -1;
+static int hf_mcastpitch_maximum                  = -1;
+static int hf_mcastpitch_average                  = -1;
+static int hf_mcastpitch_standard_deviation       = -1;
+static int hf_mcastpitch_mode                     = -1;
+static int hf_mcastpitch_99_9_percentile          = -1;
+static int hf_mcastpitch_99_percentile            = -1;
+static int hf_mcastpitch_95_percentile            = -1;
+static int hf_mcastpitch_90_percentile            = -1;
+static int hf_mcastpitch_75_percentile            = -1;
+static int hf_mcastpitch_50_percentile            = -1;
+static int hf_mcastpitch_25_percentile            = -1;
+static int hf_mcastpitch_trade_time               = -1;
+static int hf_mcastpitch_exec_venue               = -1;
+static int hf_mcastpitch_traded_currency          = -1;
+static int hf_mcastpitch_trade_report_flags       = -1;
+static int hf_mcastpitch_participant_id           = -1;
+static int hf_mcastpitch_trade_flags              = -1;
+static int hf_mcastpitch_execution_flags          = -1;
+static int hf_mcastpitch_statistic_type           = -1;
+static int hf_mcastpitch_price_determination      = -1;
 
 static gint ett_mcastpitch = -1;
 
 static expert_field ei_mcastpitch_out_of_sequence = EI_INIT;
 
-static const gint SEQUENCED_UNIT_HEADER_LEN                = 8;
-static const gint LOGIN_MESSAGE_LEN                        = 22;
-static const gint LOGIN_RESPONSE_MESSAGE_LEN               = 3;
-static const gint GAP_REQUEST_MESSAGE_LEN                  = 9;
-static const gint GAP_RESPONSE_MESSAGE_LEN                 = 10;
-static const gint TIME_MESSAGE_LEN                         = 6;
-static const gint ADD_ORDER_LONG_EU_MESSAGE_LEN            = 35;
-static const gint ADD_ORDER_LONG_US_MESSAGE_LEN            = 34;
-static const gint ADD_ORDER_SHORT_EU_MESSAGE_LEN           = 25;
-static const gint ADD_ORDER_SHORT_US_MESSAGE_LEN           = 26;
-static const gint ORDER_EXECUTED_EU_MESSAGE_LEN            = 29;
-static const gint ORDER_EXECUTED_US_MESSAGE_LEN            = 26;
+static const gint SEQUENCED_UNIT_HEADER_LEN                   = 8;
+static const gint LOGIN_MESSAGE_LEN                           = 22;
+static const gint LOGIN_RESPONSE_MESSAGE_LEN                  = 3;
+static const gint GAP_REQUEST_MESSAGE_LEN                     = 9;
+static const gint GAP_RESPONSE_MESSAGE_LEN                    = 10;
+static const gint TIME_MESSAGE_LEN                            = 6;
+static const gint ADD_ORDER_LONG_EU_MESSAGE_LEN               = 35;
+static const gint ADD_ORDER_LONG_US_MESSAGE_LEN               = 34;
+static const gint ADD_ORDER_SHORT_EU_MESSAGE_LEN              = 25;
+static const gint ADD_ORDER_SHORT_US_MESSAGE_LEN              = 26;
+static const gint ORDER_EXECUTED_EU_MESSAGE_LEN               = 29;
+static const gint ORDER_EXECUTED_US_MESSAGE_LEN               = 26;
 static const gint ORDER_EXECUTED_AT_PRICE_SIZE_EU_MESSAGE_LEN = 41;
 static const gint ORDER_EXECUTED_AT_PRICE_SIZE_US_MESSAGE_LEN = 38;
-static const gint REDUCE_SIZE_LONG_MESSAGE_LEN             = 18;
-static const gint REDUCE_SIZE_SHORT_MESSAGE_LEN            = 16;
-static const gint MODIFY_ORDER_LONG_EU_MESSAGE_LEN         = 26;
-static const gint MODIFY_ORDER_LONG_US_MESSAGE_LEN         = 27;
-static const gint MODIFY_ORDER_SHORT_EU_MESSAGE_LEN        = 18;
-static const gint MODIFY_ORDER_SHORT_US_MESSAGE_LEN        = 19;
-static const gint DELETE_ORDER_MESSAGE_LEN                 = 14;
-static const gint TRADE_LONG_EU_MESSAGE_LEN                = 47;
-static const gint TRADE_LONG_US_MESSAGE_LEN                = 41;
-static const gint TRADE_SHORT_EU_MESSAGE_LEN               = 37;
-static const gint TRADE_SHORT_US_MESSAGE_LEN               = 33;
-static const gint TRADE_BREAK_MESSAGE_LEN                  = 14;
-static const gint TRADE_REPORT_MESSAGE_LEN                 = 64;
-static const gint END_OF_SESSION_MESSAGE_LEN               = 6;
-static const gint SYMBOL_MAPPING_MESSAGE_LEN               = 29;
-static const gint TRADING_STATUS_MESSAGE_LEN               = 18;
-static const gint ADD_ORDER_EXPANDED_US_MESSAGE_LEN        = 36;
-static const gint ADD_ORDER_EXPANDED_EU_MESSAGE_LEN        = 40;
-static const gint TRADE_EXPANDED_MESSAGE_LEN               = 43;
-static const gint SPIN_IMAGE_AVAILABLE_MESSAGE_LEN         = 6;
-static const gint SPIN_REQUEST_MESSAGE_LEN                 = 6;
-static const gint SPIN_RESPONSE_MESSAGE_LEN                = 11;
-static const gint SPIN_FINISHED_MESSAGE_LEN                = 6;
-static const gint AUCTION_UPDATE_MESSAGE_LEN               = 47;
-static const gint AUCTION_SUMMARY_MESSAGE_LEN              = 27;
-static const gint UNIT_CLEAR_MESSAGE_LEN                   = 6;
-static const gint LATENCY_STAT_MESSAGE_LEN                 = 112;
-static const gint STATISTICS_MESSAGE_LEN                   = 24;
+static const gint REDUCE_SIZE_LONG_MESSAGE_LEN                = 18;
+static const gint REDUCE_SIZE_SHORT_MESSAGE_LEN               = 16;
+static const gint MODIFY_ORDER_LONG_EU_MESSAGE_LEN            = 26;
+static const gint MODIFY_ORDER_LONG_US_MESSAGE_LEN            = 27;
+static const gint MODIFY_ORDER_SHORT_EU_MESSAGE_LEN           = 18;
+static const gint MODIFY_ORDER_SHORT_US_MESSAGE_LEN           = 19;
+static const gint DELETE_ORDER_MESSAGE_LEN                    = 14;
+static const gint TRADE_LONG_EU_MESSAGE_LEN                   = 47;
+static const gint TRADE_LONG_US_MESSAGE_LEN                   = 41;
+static const gint TRADE_SHORT_EU_MESSAGE_LEN                  = 37;
+static const gint TRADE_SHORT_US_MESSAGE_LEN                  = 33;
+static const gint TRADE_BREAK_MESSAGE_LEN                     = 14;
+static const gint TRADE_REPORT_MESSAGE_LEN                    = 64;
+static const gint END_OF_SESSION_MESSAGE_LEN                  = 6;
+static const gint SYMBOL_MAPPING_MESSAGE_LEN                  = 30;
+static const gint TRADING_STATUS_MESSAGE_LEN                  = 18;
+static const gint ADD_ORDER_EXPANDED_US_MESSAGE_LEN           = 36;
+static const gint ADD_ORDER_EXPANDED_EU_MESSAGE_LEN           = 40;
+static const gint TRADE_EXPANDED_MESSAGE_LEN                  = 43;
+static const gint SPIN_IMAGE_AVAILABLE_MESSAGE_LEN            = 6;
+static const gint SPIN_REQUEST_MESSAGE_LEN                    = 6;
+static const gint SPIN_RESPONSE_MESSAGE_LEN                   = 11;
+static const gint SPIN_FINISHED_MESSAGE_LEN                   = 6;
+static const gint AUCTION_UPDATE_MESSAGE_LEN                  = 47;
+static const gint AUCTION_SUMMARY_MESSAGE_LEN                 = 27;
+static const gint UNIT_CLEAR_MESSAGE_LEN                      = 6;
+static const gint RETAIL_PRICE_IMPROVEMENT_MESSAGE_LEN        = 15;
+static const gint LATENCY_STAT_MESSAGE_LEN                    = 112;
+static const gint STATISTICS_MESSAGE_LEN                      = 24;
 
 static const value_string login_response_status[] = {
     { 'A', "'A' Login Accepted" },
@@ -167,7 +172,31 @@ static const value_string login_response_status[] = {
     { 0, NULL },
 };
 
-static const value_string mcastPitchAuctionTypes[] = {
+static const value_string gap_response_status[] = {
+    { 'A', "'A' Accepted" },
+    { 'O', "'O' Out of Range" },
+    { 'D', "'D' Daily Gap Request Allocation Exhausted" },
+    { 'M', "'M' Minute Gap Request Allocation Exhausted" },
+    { 'S', "'S' Second Gap Request Allocation Exhausted" },
+    { 'C', "'C' Count Request Limit Exceeded" },
+    { 'I', "'I' Invalid Unit" },
+    { 'U', "'U' Unit Currently Unavailable" },
+    { 0, NULL },
+};
+
+static const value_string spin_response_status[] = {
+    { 'A', "'A' Accepted" },
+    { 'O', "'O' Out of Range" },
+    { 'S', "'S' Spin Already in Progress" },
+    { 0, NULL },
+};
+
+static const value_string options_symbol_condition[] = {
+    { 'N', "'N' Normal" },
+    { 'C', "'C' Closing Only" },
+};
+
+static const value_string auction_type[] = {
     { 'O', "Opening Auction" },
     { 'C', "Closing Auction" },
     { 'H', "Halt Auction" },
@@ -191,19 +220,34 @@ static const value_string mcastPitchPriceDeterminationTypes[] = {
     { 0, NULL },
 };
 
-static const value_string mcastPitchTradingStatusTypes[] = {
-    { 'T', "Trading" },
-    { 'H', "Halted" },
-    { 'Q', "Quote-Only" },
-    { 'R', "Off-Book Reporting" },
-    { 'C', "Closed" },
-    { 'S', "Suspension" },
-    { 'N', "No Reference Price" },
-    { 'O', "Opening Auction" },
-    { 'E', "Closing Auction" },
-    { 'V', "Volatility Interruption" },
-    { 'M', "Market Order Imbalance" },
-    { 'P', "Price Monitoring Extension" },
+static const value_string trading_status[] = {
+    { 'T', "'T' Trading" },
+    { 'H', "'H' Halted" },
+    { 'Q', "'Q' Quote-Only" },
+    { 'R', "'R' Off-Book Reporting" },
+    { 'C', "'C' Closed" },
+    { 'S', "'S'Suspension" },
+    { 'N', "'N' No Reference Price" },
+    { 'O', "'O' Opening Auction" },
+    { 'E', "'E' Closing Auction" },
+    { 'V', "'V'Volatility Interruption" },
+    { 'M', "'M' Market Order Imbalance" },
+    { 'P', "'P' Price Monitoring Extension" },
+    { 'A', "'A' Accepting Orders for Queuing" },
+    { 0, NULL },
+};
+
+static const value_string reg_sho_action[] = {
+    { '0', "'0' No Price Test in Effect" },
+    { '1', "'1' Reg SHO Price Test Restriction in Effect" },
+    { 0, NULL },
+};
+
+static const value_string retail_price_improvement[] = {
+    { 'B', "'B' Buy Side RPI" },
+    { 'S', "'S' Sell Side RPI" },
+    { 'A', "'A' Buy and Sell Side RPI" },
+    { 'N', "'N' No RPI" },
     { 0, NULL },
 };
 
@@ -379,12 +423,12 @@ dissect_gap_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
 
     m_tree = proto_item_add_subtree(m_item, ett_mcastpitch);
 
-    proto_tree_add_item(m_tree, hf_mcastpitch_msg_length, tvb, *offset,      1, TRUE);
-    proto_tree_add_item(m_tree, hf_mcastpitch_msg_type,   tvb, *offset + 1,  1, TRUE);
-    proto_tree_add_item(m_tree, hf_mcastpitch_unit,       tvb, *offset + 2,  1, TRUE);
-    proto_tree_add_item(m_tree, hf_mcastpitch_sequence,   tvb, *offset + 3,  4, TRUE);
-    proto_tree_add_item(m_tree, hf_mcastpitch_count,      tvb, *offset + 7,  2, TRUE);
-    proto_tree_add_item(m_tree, hf_mcastpitch_status,     tvb, *offset + 9,  1, TRUE);
+    proto_tree_add_item(m_tree, hf_mcastpitch_msg_length,          tvb, *offset,      1, TRUE);
+    proto_tree_add_item(m_tree, hf_mcastpitch_msg_type,            tvb, *offset + 1,  1, TRUE);
+    proto_tree_add_item(m_tree, hf_mcastpitch_unit,                tvb, *offset + 2,  1, TRUE);
+    proto_tree_add_item(m_tree, hf_mcastpitch_sequence,            tvb, *offset + 3,  4, TRUE);
+    proto_tree_add_item(m_tree, hf_mcastpitch_count,               tvb, *offset + 7,  2, TRUE);
+    proto_tree_add_item(m_tree, hf_mcastpitch_gap_response_status, tvb, *offset + 9,  1, TRUE);
     
     *offset = *offset + GAP_RESPONSE_MESSAGE_LEN;
 
@@ -440,7 +484,7 @@ dissect_add_order_long_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item      (msg_tree, hf_mcastpitch_long_quantity, tvb, *offset + 15, 4, TRUE);
     proto_tree_add_item      (msg_tree, hf_mcastpitch_symbol6,       tvb, *offset + 19, 6, TRUE);
     proto_tree_add_long_price(msg_tree, hf_mcastpitch_long_price,    tvb, *offset + 25);
-    proto_tree_add_item      (msg_tree, hf_mcastpitch_add_flags,     tvb, *offset + 26, 1, TRUE);
+    proto_tree_add_item      (msg_tree, hf_mcastpitch_add_flags,     tvb, *offset + 33, 1, TRUE);
     
     *offset = *offset + ADD_ORDER_LONG_US_MESSAGE_LEN;
     
@@ -547,6 +591,7 @@ dissect_order_executed_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_lengt
     proto_tree_add_base36(msg_tree, hf_mcastpitch_order_id,        tvb, *offset + 6);
     proto_tree_add_item  (msg_tree, hf_mcastpitch_executed_shares, tvb, *offset + 14, 4, TRUE);
     proto_tree_add_base36(msg_tree, hf_mcastpitch_execution_id,    tvb, *offset + 18);
+
     if (!us_format) {
         proto_tree_add_item(msg_tree, hf_mcastpitch_execution_flags, tvb, *offset + 26, 3, TRUE);
     }
@@ -587,6 +632,7 @@ dissect_order_executed_at_price_size_message(tvbuff_t *tvb, proto_tree *tree, gu
     proto_tree_add_item      (msg_tree, hf_mcastpitch_remaining_shares, tvb, *offset + 18, 4, TRUE);
     proto_tree_add_base36    (msg_tree, hf_mcastpitch_execution_id,     tvb, *offset + 22);
     proto_tree_add_long_price(msg_tree, hf_mcastpitch_long_price,       tvb, *offset + 30);
+
     if (!us_format) {
         proto_tree_add_item(msg_tree, hf_mcastpitch_execution_flags, tvb, *offset + 38, 3, TRUE);
     }
@@ -849,6 +895,7 @@ dissect_trade_short_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_length, 
     proto_tree_add_item       (msg_tree, hf_mcastpitch_symbol6,        tvb, *offset + 17, 6, TRUE);
     proto_tree_add_short_price(msg_tree, hf_mcastpitch_short_price,    tvb, *offset + 23);
     proto_tree_add_base36     (msg_tree, hf_mcastpitch_execution_id,   tvb, *offset + 25);
+
     if (!us_format) {
         proto_tree_add_item   (msg_tree, hf_mcastpitch_trade_flags,    tvb, *offset + 33, 4, TRUE);
     }
@@ -987,10 +1034,11 @@ dissect_symbol_mapping_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
 
     msg_tree = proto_item_add_subtree(msg_item, ett_mcastpitch);
 
-    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_length,    tvb, *offset,     1, TRUE);
-    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_type,      tvb, *offset + 1, 1, TRUE);
-    proto_tree_add_item(msg_tree, hf_mcastpitch_symbol6,       tvb, *offset + 2, 6, TRUE);
-    proto_tree_add_item(msg_tree, hf_mcastpitch_osi_symbol,    tvb, *offset + 8, 21, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_length,               tvb, *offset,      1,  TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_type,                 tvb, *offset + 1,  1,  TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_symbol6,                  tvb, *offset + 2,  6,  TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_osi_symbol,               tvb, *offset + 8,  21, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_options_symbol_condition, tvb, *offset + 29, 1,  TRUE);
 
     *offset = *offset + SYMBOL_MAPPING_MESSAGE_LEN;
     
@@ -1090,7 +1138,7 @@ dissect_trading_status_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_msg_type,       tvb, *offset + 1,  1, TRUE);
     proto_tree_add_item(msg_tree, hf_mcastpitch_time_offset,    tvb, *offset + 2,  4, TRUE);
     proto_tree_add_item(msg_tree, hf_mcastpitch_symbol8,        tvb, *offset + 6,  8, TRUE);
-    proto_tree_add_item(msg_tree, hf_mcastpitch_halt_status,    tvb, *offset + 14, 1, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_trading_status, tvb, *offset + 14, 1, TRUE);
     proto_tree_add_item(msg_tree, hf_mcastpitch_reg_sho_action, tvb, *offset + 15, 1, TRUE);
     proto_tree_add_item(msg_tree, hf_mcastpitch_reserved1,      tvb, *offset + 16, 1, TRUE);
     proto_tree_add_item(msg_tree, hf_mcastpitch_reserved2,      tvb, *offset + 17, 1, TRUE);
@@ -1169,8 +1217,10 @@ dissect_spin_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_msg_length,     tvb, *offset,      1, TRUE);
     proto_tree_add_item(msg_tree, hf_mcastpitch_msg_type,       tvb, *offset + 1,  1, TRUE);
     proto_tree_add_item(msg_tree, hf_mcastpitch_sequence,       tvb, *offset + 2,  4, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_order_count,    tvb, *offset + 6,  4, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_status,         tvb, *offset + 10, 1, TRUE);
 
-    *offset = *offset + SPIN_FINISHED_MESSAGE_LEN;
+    *offset = *offset + SPIN_RESPONSE_MESSAGE_LEN;
     
     return 1;
 }
@@ -1194,10 +1244,8 @@ dissect_spin_finished_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_msg_length,     tvb, *offset,      1, TRUE);
     proto_tree_add_item(msg_tree, hf_mcastpitch_msg_type,       tvb, *offset + 1,  1, TRUE);
     proto_tree_add_item(msg_tree, hf_mcastpitch_sequence,       tvb, *offset + 2,  4, TRUE);
-    proto_tree_add_item(msg_tree, hf_mcastpitch_order_count,    tvb, *offset + 6,  4, TRUE);
-    proto_tree_add_item(msg_tree, hf_mcastpitch_status,         tvb, *offset + 10, 1, TRUE);
 
-    *offset = *offset + SPIN_RESPONSE_MESSAGE_LEN;
+    *offset = *offset + SPIN_FINISHED_MESSAGE_LEN;
     
     return 1;
 }
@@ -1366,11 +1414,38 @@ dissect_unit_clear_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
 
     msg_tree = proto_item_add_subtree(msg_item, ett_mcastpitch);
 
-    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_length,     tvb, *offset,       1, TRUE);
-    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_type,       tvb, *offset + 1,   1, TRUE);
-    proto_tree_add_item(msg_tree, hf_mcastpitch_time_offset,    tvb, *offset + 2,   4, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_length,     tvb, *offset,     1, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_type,       tvb, *offset + 1, 1, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_time_offset,    tvb, *offset + 2, 4, TRUE);
 
     *offset = *offset + UNIT_CLEAR_MESSAGE_LEN;
+
+    return 1;
+}
+
+static guint8
+dissect_retail_price_improvement_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
+{
+    proto_item *msg_item;
+    proto_tree *msg_tree;
+
+    if (tvb_length_remaining(tvb, *offset) < RETAIL_PRICE_IMPROVEMENT_MESSAGE_LEN) {
+        return 0;
+    }
+
+    msg_item = proto_tree_add_protocol_format(
+            tree, proto_mcastpitch, tvb,
+            *offset, RETAIL_PRICE_IMPROVEMENT_MESSAGE_LEN, "Retail Price Improvement");
+
+    msg_tree = proto_item_add_subtree(msg_item, ett_mcastpitch);
+
+    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_length,               tvb, *offset,      1, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_msg_type,                 tvb, *offset + 1,  1, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_time_offset,              tvb, *offset + 2,  4, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_symbol8,                  tvb, *offset + 6,  8, TRUE);
+    proto_tree_add_item(msg_tree, hf_mcastpitch_retail_price_improvement, tvb, *offset + 14, 1, TRUE);
+
+    *offset = *offset + RETAIL_PRICE_IMPROVEMENT_MESSAGE_LEN;
 
     return 1;
 }
@@ -1615,6 +1690,10 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *da
             case 0x97:
                 result = dissect_unit_clear_message(tvb, tree, &offset);
                 break;
+
+            case 0x98:
+                result = dissect_retail_price_improvement_message(tvb, tree, &offset);
+                break;
         }
 
         if (result == 0) {
@@ -1638,75 +1717,79 @@ void
 proto_register_mcastpitch(void)
 {
 	static hf_register_info hf[] = {
-            { &hf_mcastpitch_hdr_length,            { "Hdr Length",              "mcastpitch.hdr_length",          FT_UINT16, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_hdr_count,             { "Hdr Count",               "mcastpitch.hdr_count",           FT_UINT8,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_hdr_unit,              { "Hdr Unit",                "mcastpitch.hdr_unit",            FT_UINT8,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_hdr_sequence,          { "Hdr Sequence",            "mcastpitch.hdr_sequence",        FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_msg_length,            { "Msg Length",              "mcastpitch.msg_length",          FT_UINT8,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_msg_type,              { "Msg Type",                "mcastpitch.msg_type",            FT_UINT8,  BASE_HEX,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_time,                  { "Time",                    "mcastpitch.time",                FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_time_offset,           { "Time Offset",             "mcastpitch.time_offset",         FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_order_id,              { "Order ID",                "mcastpitch.order_id",            FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_side,                  { "Side",                    "mcastpitch.side",                FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_long_quantity,         { "Quantity (Long)",         "mcastpitch.qty",                 FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_quantity8,             { "Quantity (Long)",         "mcastpitch.qty",                 FT_UINT64, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_symbol6,               { "Symbol",                  "mcastpitch.symbol",              FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_long_price,            { "Price (Long)",            "mcastpitch.price",               FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_short_quantity,        { "Quantity (Short)",        "mcastpitch.qty",                 FT_UINT16, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_short_price,           { "Price (Short)",           "mcastpitch.price",               FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_executed_shares,       { "Executed Shares",         "mcastpitch.executed_shares",     FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_execution_id,          { "Execution ID",            "mcastpitch.execution_id",        FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_trade_id,              { "Trade ID",                "mcastpitch.trade_id",            FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_remaining_shares,      { "Remaining Shares",        "mcastpitch.remaining_shares",    FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_long_canceled_shares,  { "Canceled Shares (Long)",  "mcastpitch.canceled_shares",     FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_short_canceled_shares, { "Canceled Shares (Short)", "mcastpitch.canceled_shares",     FT_UINT16, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_symbol8,               { "Symbol",                  "mcastpitch.symbol",              FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_add_flags,             { "Add Flags",               "mcastpitch.add_flags",           FT_UINT8,  BASE_HEX,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_osi_symbol,            { "OSI Symbol",              "mcastpitch.osi_symbol",          FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_session_sub_id,        { "Session Sub ID",          "mcastpitch.session_sub_id",      FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_username,              { "Username",                "mcastpitch.username",            FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_filler,                { "Filler",                  "mcastpitch.filler",              FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_password,              { "Password",                "mcastpitch.password",            FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_login_status,          { "Login Status",            "mcastpitch.login_status",        FT_UINT8,  BASE_HEX,     login_response_status, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_halt_status,           { "Halt Status",             "mcastpitch.halt_status",         FT_UINT8,  BASE_DEC,     mcastPitchTradingStatusTypes, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_reg_sho_action,        { "Reg SHO Action",          "mcastpitch.reg_sho_action",      FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_reserved1,             { "Reserved 1",              "mcastpitch.reserved1",           FT_UINT8,  BASE_HEX,     NULL, 0x0, NULL, HFILL } }, 
-            { &hf_mcastpitch_reserved2,             { "Reserved 2",              "mcastpitch.reserved2",           FT_UINT8,  BASE_HEX,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_auction_type,          { "Auction Type",            "mcastpitch.auction_type",        FT_UINT8,  BASE_DEC,     mcastPitchAuctionTypes, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_reference_price,       { "Reference Price",         "mcastpitch.reference_price",     FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_buy_shares,            { "Buy Shares",              "mcastpitch.buy_shares",          FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_sell_shares,           { "Sell Shares",             "mcastpitch.sell_shares",         FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_indicative_price,      { "Indicative Price",        "mcastpitch.indicative_price",    FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_auction_only_price,    { "Auction Only Price",      "mcastpitch.auction_only_price",  FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_status,                { "Status",                  "mcastpitch.auction_only_price",  FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_unit,                  { "Unit",                    "mcastpitch.unit",                FT_UINT8,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_count,                 { "Count",                   "mcastpitch.count",               FT_UINT16, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_measurement_type,      { "Measurement Type",        "mcastpitch.measurement_type",    FT_UINT8,  BASE_HEX,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_begin_time,            { "Begin Time",              "mcastpitch.begin_time",          FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_end_time,              { "End Time",                "mcastpitch.end_time",            FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_sequence,              { "Sequence",                "mcastpitch.sequence",            FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_order_count,           { "Order Count",             "mcastpitch.order_count",         FT_UINT32, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_minimum,               { "Minimum",                 "mcastpitch.minimum",             FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_maximum,               { "Maximum",                 "mcastpitch.maximum",             FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_average,               { "Average",                 "mcastpitch.average",             FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_standard_deviation,    { "Standard Deviation",      "mcastpitch.standard_deviation",  FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_mode,                  { "Mode",                    "mcastpitch.mode",                FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_99_9_percentile,       { "99.9 Percentile",         "mcastpitch.99_9_percentile",     FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_99_percentile,         { "99 Percentile",           "mcastpitch.99_percentile",       FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_95_percentile,         { "95 Percentile",           "mcastpitch.95_percentile",       FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_90_percentile,         { "90 Percentile",           "mcastpitch.90_percentile",       FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_75_percentile,         { "75 Percentile",           "mcastpitch.75_percentile",       FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_50_percentile,         { "50 Percentile (Median)",  "mcastpitch.50_percentile",       FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_25_percentile,         { "25 Percentile",           "mcastpitch.25_percentile",       FT_DOUBLE, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_trade_time,            { "Trade Time",              "mcastpitch.trade_time",          FT_UINT64, BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_exec_venue,            { "Execution Venue",         "mcastpitch.exec_venue",          FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_traded_currency,       { "Traded Currency",         "mcastpitch.traded_currency",     FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_trade_report_flags,    { "Trade Report Flags",      "mcastpitch.trade_report_flags",  FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_participant_id,        { "Participant ID",          "mcastpitch.participant_id",      FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_trade_flags,           { "Trade Flags",             "mcastpitch.trade_flags",         FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_execution_flags,       { "Execution Flags",         "mcastpitch.execution_flags",     FT_STRING, BASE_NONE,    NULL, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_statistic_type,        { "Statistic Type",          "mcastpitch.statistic_type",      FT_UINT8,  BASE_DEC,     mcastPitchStatisticTypes, 0x0, NULL, HFILL } },
-            { &hf_mcastpitch_price_determination,   { "Price Determination",     "mcastpitch.price_determination", FT_UINT8,  BASE_DEC,     mcastPitchPriceDeterminationTypes, 0x0, NULL, HFILL } },
+            { &hf_mcastpitch_hdr_length,               { "Hdr Length",               "mcastpitch.hdr_length",               FT_UINT16, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_hdr_count,                { "Hdr Count",                "mcastpitch.hdr_count",                FT_UINT8,  BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_hdr_unit,                 { "Hdr Unit",                 "mcastpitch.hdr_unit",                 FT_UINT8,  BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_hdr_sequence,             { "Hdr Sequence",             "mcastpitch.hdr_sequence",             FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_msg_length,               { "Msg Length",               "mcastpitch.msg_length",               FT_UINT8,  BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_msg_type,                 { "Msg Type",                 "mcastpitch.msg_type",                 FT_UINT8,  BASE_HEX,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_time,                     { "Time",                     "mcastpitch.time",                     FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_time_offset,              { "Time Offset",              "mcastpitch.time_offset",              FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_order_id,                 { "Order ID",                 "mcastpitch.order_id",                 FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_side,                     { "Side",                     "mcastpitch.side",                     FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_long_quantity,            { "Quantity (Long)",          "mcastpitch.qty",                      FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_quantity8,                { "Quantity (Long)",          "mcastpitch.qty",                      FT_UINT64, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_symbol6,                  { "Symbol",                   "mcastpitch.symbol",                   FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_long_price,               { "Price (Long)",             "mcastpitch.price",                    FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_short_quantity,           { "Quantity (Short)",         "mcastpitch.qty",                      FT_UINT16, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_short_price,              { "Price (Short)",            "mcastpitch.price",                    FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_executed_shares,          { "Executed Shares",          "mcastpitch.executed_shares",          FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_execution_id,             { "Execution ID",             "mcastpitch.execution_id",             FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_trade_id,                 { "Trade ID",                 "mcastpitch.trade_id",                 FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_remaining_shares,         { "Remaining Shares",         "mcastpitch.remaining_shares",         FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_long_canceled_shares,     { "Canceled Shares (Long)",   "mcastpitch.canceled_shares",          FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_short_canceled_shares,    { "Canceled Shares (Short)",  "mcastpitch.canceled_shares",          FT_UINT16, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_symbol8,                  { "Symbol",                   "mcastpitch.symbol",                   FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_add_flags,                { "Add Flags",                "mcastpitch.add_flags",                FT_UINT8,  BASE_HEX,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_osi_symbol,               { "OSI Symbol",               "mcastpitch.osi_symbol",               FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_session_sub_id,           { "Session Sub ID",           "mcastpitch.session_sub_id",           FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_username,                 { "Username",                 "mcastpitch.username",                 FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_filler,                   { "Filler",                   "mcastpitch.filler",                   FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_password,                 { "Password",                 "mcastpitch.password",                 FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_login_status,             { "Login Status",             "mcastpitch.login_status",             FT_UINT8,  BASE_HEX,     login_response_status,             0x0, NULL, HFILL } },
+            { &hf_mcastpitch_options_symbol_condition, { "Options Symbol Condition", "mcastpitch.symbol_condition",         FT_UINT8,  BASE_HEX,     options_symbol_condition,          0x0, NULL, HFILL } },
+            { &hf_mcastpitch_trading_status,           { "Trading Status",           "mcastpitch.trading_status",           FT_UINT8,  BASE_DEC,     trading_status,                    0x0, NULL, HFILL } },
+            { &hf_mcastpitch_reg_sho_action,           { "Reg SHO Action",           "mcastpitch.reg_sho_action",           FT_UINT8,  BASE_HEX,     reg_sho_action,                    0x0, NULL, HFILL } },
+            { &hf_mcastpitch_retail_price_improvement, { "Retail Price Improvement", "mcastpitch.retail_price_improvement", FT_UINT8,  BASE_HEX,     retail_price_improvement,          0x0, NULL, HFILL } },
+            { &hf_mcastpitch_reserved1,                { "Reserved 1",               "mcastpitch.reserved1",                FT_UINT8,  BASE_HEX,     NULL,                              0x0, NULL, HFILL } }, 
+            { &hf_mcastpitch_reserved2,                { "Reserved 2",               "mcastpitch.reserved2",                FT_UINT8,  BASE_HEX,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_auction_type,             { "Auction Type",             "mcastpitch.auction_type",             FT_UINT8,  BASE_HEX,     auction_type,                      0x0, NULL, HFILL } },
+            { &hf_mcastpitch_reference_price,          { "Reference Price",          "mcastpitch.reference_price",          FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_buy_shares,               { "Buy Shares",               "mcastpitch.buy_shares",               FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_sell_shares,              { "Sell Shares",              "mcastpitch.sell_shares",              FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_indicative_price,         { "Indicative Price",         "mcastpitch.indicative_price",         FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_auction_only_price,       { "Auction Only Price",       "mcastpitch.auction_only_price",       FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_gap_response_status,      { "Gap Response Status",      "mcastpitch.gap_response_status",      FT_UINT8,  BASE_HEX,     gap_response_status,               0x0, NULL, HFILL } },
+            { &hf_mcastpitch_spin_response_status,     { "Spin Response Status",     "mcastpitch.spin_response_status",     FT_UINT8,  BASE_HEX,     spin_response_status,              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_status,                   { "Status",                   "mcastpitch.auction_only_price",       FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_unit,                     { "Unit",                     "mcastpitch.unit",                     FT_UINT8,  BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_count,                    { "Count",                    "mcastpitch.count",                    FT_UINT16, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_measurement_type,         { "Measurement Type",         "mcastpitch.measurement_type",         FT_UINT8,  BASE_HEX,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_begin_time,               { "Begin Time",               "mcastpitch.begin_time",               FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_end_time,                 { "End Time",                 "mcastpitch.end_time",                 FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_sequence,                 { "Sequence",                 "mcastpitch.sequence",                 FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_order_count,              { "Order Count",              "mcastpitch.order_count",              FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_minimum,                  { "Minimum",                  "mcastpitch.minimum",                  FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_maximum,                  { "Maximum",                  "mcastpitch.maximum",                  FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_average,                  { "Average",                  "mcastpitch.average",                  FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_standard_deviation,       { "Standard Deviation",       "mcastpitch.standard_deviation",       FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_mode,                     { "Mode",                     "mcastpitch.mode",                     FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_99_9_percentile,          { "99.9 Percentile",          "mcastpitch.99_9_percentile",          FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_99_percentile,            { "99 Percentile",            "mcastpitch.99_percentile",            FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_95_percentile,            { "95 Percentile",            "mcastpitch.95_percentile",            FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_90_percentile,            { "90 Percentile",            "mcastpitch.90_percentile",            FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_75_percentile,            { "75 Percentile",            "mcastpitch.75_percentile",            FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_50_percentile,            { "50 Percentile (Median)",   "mcastpitch.50_percentile",            FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_25_percentile,            { "25 Percentile",            "mcastpitch.25_percentile",            FT_DOUBLE, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_trade_time,               { "Trade Time",               "mcastpitch.trade_time",               FT_UINT64, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_exec_venue,               { "Execution Venue",          "mcastpitch.exec_venue",               FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_traded_currency,          { "Traded Currency",          "mcastpitch.traded_currency",          FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_trade_report_flags,       { "Trade Report Flags",       "mcastpitch.trade_report_flags",       FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_participant_id,           { "Participant ID",           "mcastpitch.participant_id",           FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_trade_flags,              { "Trade Flags",              "mcastpitch.trade_flags",              FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_execution_flags,          { "Execution Flags",          "mcastpitch.execution_flags",          FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+            { &hf_mcastpitch_statistic_type,           { "Statistic Type",           "mcastpitch.statistic_type",           FT_UINT8,  BASE_DEC,     mcastPitchStatisticTypes,          0x0, NULL, HFILL } },
+            { &hf_mcastpitch_price_determination,      { "Price Determination",      "mcastpitch.price_determination",      FT_UINT8,  BASE_DEC,     mcastPitchPriceDeterminationTypes, 0x0, NULL, HFILL } },
 	};
 
 	static gint *ett[] = {
