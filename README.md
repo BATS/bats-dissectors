@@ -14,9 +14,8 @@ Protocols Covered
 -----------------
 
 Currently, only the Multicast PITCH protocol dissector has been made
-available. We have internally working dissectors for Binary Order
-Entry (BOE) version 1, and expect to soon make a BOE version 2
-dissector available.
+available. An older Binary Order Entry (BOE) version 1 dissector is
+here which needs clean up and support for version 2 messages.
 
 Requirements
 ------------
