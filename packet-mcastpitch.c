@@ -34,10 +34,6 @@
 #include <epan/packet.h>
 #include <epan/prefs.h>
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 int proto_mcastpitch = -1;
 static dissector_handle_t mcastpitch_handle;
 
