@@ -32,8 +32,8 @@ it won't work with some previous versions.
 Linux Compilation
 -----------------
 
-1. Copy the packet-mcastpitch.c file into the epan/dissectors
-directory.
+1. Copy (or symlink) the packet-mcastpitch.c file into the
+epan/dissectors directory.
 
 2. Edit epan/dissectors/Makefile.common and add packet-mcastpitch.c to
 DISSECTOR_SRC.
@@ -61,7 +61,7 @@ decode this:
 * low matching unit number
 * high matching unit number
 * feed type: "rt" (realtime) or "gap" (gap response)
-* market + shape: za => (z = BZX, a = GIG A); other markets are y (BYX), a (EDGA), and x (EDGX).
+* market + shape: za => (z = BZX, a = GIG A); other markets are y (BYX), a (EDGA), x (EDGX), and o (BZX Options)
 
 Binaries
 --------

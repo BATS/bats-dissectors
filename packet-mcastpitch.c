@@ -2399,4 +2399,188 @@ proto_register_mcastpitch(void)
     add_ip_name_from_string("233.19.3.75", "mcpitch.ny5.u21.u24.gap.xe");
     add_ip_name_from_string("233.19.3.77", "mcpitch.ny5.u25.u28.gap.xe");
     add_ip_name_from_string("233.19.3.78", "mcpitch.ny5.u29.u32.gap.xe");
+
+    /* --------------------------------------------------------------------------------
+     * BZX Options Market
+     * -------------------------------------------------------------------------------- */
+    
+    /* NJ2 - BZX Options - GIG A - Realtime */
+    add_ip_name_from_string("224.0.62.96",  "mcpitch.nj2.u1.u4.rt.oa");
+    add_ip_name_from_string("224.0.62.98",  "mcpitch.nj2.u5.u8.rt.oa");
+    add_ip_name_from_string("224.0.62.100", "mcpitch.nj2.u9.u12.rt.oa");
+    add_ip_name_from_string("224.0.62.102", "mcpitch.nj2.u13.u16.rt.oa");
+    add_ip_name_from_string("224.0.62.104", "mcpitch.nj2.u17.u20.rt.oa");
+    add_ip_name_from_string("224.0.62.106", "mcpitch.nj2.u21.u24.rt.oa");
+    add_ip_name_from_string("224.0.62.108", "mcpitch.nj2.u25.u28.rt.oa");
+    add_ip_name_from_string("224.0.62.110", "mcpitch.nj2.u29.u32.rt.oa");
+
+    /* NJ2 - BZX Options - GIG A - Gap */
+    add_ip_name_from_string("224.0.62.97",  "mcpitch.nj2.u1.u4.gap.oa");
+    add_ip_name_from_string("224.0.62.99",  "mcpitch.nj2.u5.u8.gap.oa");
+    add_ip_name_from_string("224.0.62.101", "mcpitch.nj2.u9.u12.gap.oa");
+    add_ip_name_from_string("224.0.62.103", "mcpitch.nj2.u13.u16.gap.oa");
+    add_ip_name_from_string("224.0.62.105", "mcpitch.nj2.u17.u20.gap.oa");
+    add_ip_name_from_string("224.0.62.107", "mcpitch.nj2.u21.u24.gap.oa");
+    add_ip_name_from_string("224.0.62.109", "mcpitch.nj2.u25.u28.gap.oa");
+    add_ip_name_from_string("224.0.62.111", "mcpitch.nj2.u29.u32.gap.oa");
+
+    /* NJ2 - BZX Options - WAN C - Realtime */
+    add_ip_name_from_string("224.0.62.120", "mcpitch.nj2.u1.u4.rt.oc");
+    add_ip_name_from_string("224.0.62.122", "mcpitch.nj2.u5.u8.rt.oc");
+    add_ip_name_from_string("224.0.62.124", "mcpitch.nj2.u9.u12.rt.oc");
+    add_ip_name_from_string("224.0.62.126", "mcpitch.nj2.u13.u16.rt.oc");
+    add_ip_name_from_string("224.0.62.128", "mcpitch.nj2.u17.u20.rt.oc");
+    add_ip_name_from_string("224.0.62.130", "mcpitch.nj2.u21.u24.rt.oc");
+    add_ip_name_from_string("224.0.62.132", "mcpitch.nj2.u25.u28.rt.oc");
+    add_ip_name_from_string("224.0.62.134", "mcpitch.nj2.u29.u32.rt.oc");
+
+    /* NJ2 - BZX Options - WAN C - Gap */
+    add_ip_name_from_string("224.0.62.121", "mcpitch.nj2.u1.u4.gap.oc");
+    add_ip_name_from_string("224.0.62.123", "mcpitch.nj2.u5.u8.gap.oc");
+    add_ip_name_from_string("224.0.62.125", "mcpitch.nj2.u9.u12.gap.oc");
+    add_ip_name_from_string("224.0.62.127", "mcpitch.nj2.u13.u16.gap.oc");
+    add_ip_name_from_string("224.0.62.129", "mcpitch.nj2.u17.u20.gap.oc");
+    add_ip_name_from_string("224.0.62.131", "mcpitch.nj2.u21.u24.gap.oc");
+    add_ip_name_from_string("224.0.62.133", "mcpitch.nj2.u25.u28.gap.oc");
+    add_ip_name_from_string("224.0.62.135", "mcpitch.nj2.u29.u32.gap.oc");
+
+    /* NJ2 - BZX Options - GIG B - Realtime */
+    add_ip_name_from_string("233.19.3.160", "mcpitch.nj2.u1.u4.rt.ob");
+    add_ip_name_from_string("233.19.3.162", "mcpitch.nj2.u5.u8.rt.ob");
+    add_ip_name_from_string("233.19.3.164", "mcpitch.nj2.u9.u12.rt.ob");
+    add_ip_name_from_string("233.19.3.166", "mcpitch.nj2.u13.u16.rt.ob");
+    add_ip_name_from_string("233.19.3.168", "mcpitch.nj2.u17.u20.rt.ob");
+    add_ip_name_from_string("233.19.3.170", "mcpitch.nj2.u21.u24.rt.ob");
+    add_ip_name_from_string("233.19.3.172", "mcpitch.nj2.u25.u28.rt.ob");
+    add_ip_name_from_string("233.19.3.174", "mcpitch.nj2.u29.u32.rt.ob");
+
+    /* NJ2 - BZX Options - GIG B - Gap */
+    add_ip_name_from_string("233.19.3.161", "mcpitch.nj2.u1.u4.gap.ob");
+    add_ip_name_from_string("233.19.3.163", "mcpitch.nj2.u5.u8.gap.ob");
+    add_ip_name_from_string("233.19.3.165", "mcpitch.nj2.u9.u12.gap.ob");
+    add_ip_name_from_string("233.19.3.167", "mcpitch.nj2.u13.u16.gap.ob");
+    add_ip_name_from_string("233.19.3.169", "mcpitch.nj2.u17.u20.gap.ob");
+    add_ip_name_from_string("233.19.3.171", "mcpitch.nj2.u21.u24.gap.ob");
+    add_ip_name_from_string("233.19.3.173", "mcpitch.nj2.u25.u28.gap.ob");
+    add_ip_name_from_string("233.19.3.175", "mcpitch.nj2.u29.u32.gap.ob");
+
+    /* NJ2 - BZX Options - WAN D - Realtime */
+    add_ip_name_from_string("233.19.3.176", "mcpitch.nj2.u1.u4.rt.od");
+    add_ip_name_from_string("233.19.3.178", "mcpitch.nj2.u5.u8.rt.od");
+    add_ip_name_from_string("233.19.3.180", "mcpitch.nj2.u9.u12.rt.od");
+    add_ip_name_from_string("233.19.3.182", "mcpitch.nj2.u13.u16.rt.od");
+    add_ip_name_from_string("233.19.3.184", "mcpitch.nj2.u17.u20.rt.od");
+    add_ip_name_from_string("233.19.3.186", "mcpitch.nj2.u21.u24.rt.od");
+    add_ip_name_from_string("233.19.3.188", "mcpitch.nj2.u25.u28.rt.od");
+    add_ip_name_from_string("233.19.3.190", "mcpitch.nj2.u29.u32.rt.od");
+
+    /* NJ2 - BZX Options - WAN D - Gap */
+    add_ip_name_from_string("233.19.3.177", "mcpitch.nj2.u1.u4.gap.od");
+    add_ip_name_from_string("233.19.3.179", "mcpitch.nj2.u5.u8.gap.od");
+    add_ip_name_from_string("233.19.3.181", "mcpitch.nj2.u9.u12.gap.od");
+    add_ip_name_from_string("233.19.3.183", "mcpitch.nj2.u13.u16.gap.od");
+    add_ip_name_from_string("233.19.3.185", "mcpitch.nj2.u17.u20.gap.od");
+    add_ip_name_from_string("233.19.3.187", "mcpitch.nj2.u21.u24.gap.od");
+    add_ip_name_from_string("233.19.3.189", "mcpitch.nj2.u25.u28.gap.od");
+    add_ip_name_from_string("233.19.3.191", "mcpitch.nj2.u29.u32.gap.od");
+
+    /* NY5 - BZX Options - GIG A - Realtime */
+    add_ip_name_from_string("224.0.131.0", "mcpitch.ny5.u1.u4.rt.oa");
+    add_ip_name_from_string("224.0.131.1", "mcpitch.ny5.u5.u8.rt.oa");
+    add_ip_name_from_string("224.0.131.2", "mcpitch.ny5.u9.u12.rt.oa");
+    add_ip_name_from_string("224.0.131.3", "mcpitch.ny5.u13.u16.rt.oa");
+    add_ip_name_from_string("224.0.131.4", "mcpitch.ny5.u17.u20.rt.oa");
+    add_ip_name_from_string("224.0.131.5", "mcpitch.ny5.u21.u24.rt.oa");
+    add_ip_name_from_string("224.0.131.6", "mcpitch.ny5.u25.u28.rt.oa");
+    add_ip_name_from_string("224.0.131.7", "mcpitch.ny5.u29.u32.rt.oa");
+
+    /* NY5 - BZX Options - GIG A - Gap */
+    add_ip_name_from_string("224.0.131.16", "mcpitch.ny5.u1.u4.gap.oa");
+    add_ip_name_from_string("224.0.131.17", "mcpitch.ny5.u5.u8.gap.oa");
+    add_ip_name_from_string("224.0.131.18", "mcpitch.ny5.u9.u12.gap.oa");
+    add_ip_name_from_string("224.0.131.19", "mcpitch.ny5.u13.u16.gap.oa");
+    add_ip_name_from_string("224.0.131.20", "mcpitch.ny5.u17.u20.gap.oa");
+    add_ip_name_from_string("224.0.131.21", "mcpitch.ny5.u21.u24.gap.oa");
+    add_ip_name_from_string("224.0.131.22", "mcpitch.ny5.u25.u28.gap.oa");
+    add_ip_name_from_string("224.0.131.23", "mcpitch.ny5.u29.u32.gap.oa");
+
+    /* NY5 - BZX Options - WAN C - Realtime */
+    add_ip_name_from_string("224.0.131.32", "mcpitch.ny5.u1.u4.rt.oc");
+    add_ip_name_from_string("224.0.131.33", "mcpitch.ny5.u5.u8.rt.oc");
+    add_ip_name_from_string("224.0.131.34", "mcpitch.ny5.u9.u12.rt.oc");
+    add_ip_name_from_string("224.0.131.35", "mcpitch.ny5.u13.u16.rt.oc");
+    add_ip_name_from_string("224.0.131.36", "mcpitch.ny5.u17.u20.rt.oc");
+    add_ip_name_from_string("224.0.131.37", "mcpitch.ny5.u21.u24.rt.oc");
+    add_ip_name_from_string("224.0.131.38", "mcpitch.ny5.u25.u28.rt.oc");
+    add_ip_name_from_string("224.0.131.39", "mcpitch.ny5.u29.u32.rt.oc");
+
+    /* NY5 - BZX Options - WAN C - Gap */
+    add_ip_name_from_string("224.0.131.48", "mcpitch.ny5.u1.u4.gap.oc");
+    add_ip_name_from_string("224.0.131.49", "mcpitch.ny5.u5.u8.gap.oc");
+    add_ip_name_from_string("224.0.131.50", "mcpitch.ny5.u9.u12.gap.oc");
+    add_ip_name_from_string("224.0.131.51", "mcpitch.ny5.u13.u16.gap.oc");
+    add_ip_name_from_string("224.0.131.52", "mcpitch.ny5.u17.u20.gap.oc");
+    add_ip_name_from_string("224.0.131.53", "mcpitch.ny5.u21.u24.gap.oc");
+    add_ip_name_from_string("224.0.131.54", "mcpitch.ny5.u25.u28.gap.oc");
+    add_ip_name_from_string("224.0.131.55", "mcpitch.ny5.u29.u32.gap.oc");
+
+    /* NY5 - BZX Options - GIG B - Realtime */
+    add_ip_name_from_string("233.130.124.0", "mcpitch.ny5.u1.u4.rt.ob");
+    add_ip_name_from_string("233.130.124.1", "mcpitch.ny5.u5.u8.rt.ob");
+    add_ip_name_from_string("233.130.124.2", "mcpitch.ny5.u9.u12.rt.ob");
+    add_ip_name_from_string("233.130.124.3", "mcpitch.ny5.u13.u16.rt.ob");
+    add_ip_name_from_string("233.130.124.4", "mcpitch.ny5.u17.u20.rt.ob");
+    add_ip_name_from_string("233.130.124.5", "mcpitch.ny5.u21.u24.rt.ob");
+    add_ip_name_from_string("233.130.124.6", "mcpitch.ny5.u25.u28.rt.ob");
+    add_ip_name_from_string("233.130.124.7", "mcpitch.ny5.u29.u32.rt.ob");
+
+    /* NY5 - BZX Options - GIG B - Gap */
+    add_ip_name_from_string("233.130.124.16", "mcpitch.ny5.u1.u4.gap.ob");
+    add_ip_name_from_string("233.130.124.17", "mcpitch.ny5.u5.u8.gap.ob");
+    add_ip_name_from_string("233.130.124.18", "mcpitch.ny5.u9.u12.gap.ob");
+    add_ip_name_from_string("233.130.124.19", "mcpitch.ny5.u13.u16.gap.ob");
+    add_ip_name_from_string("233.130.124.20", "mcpitch.ny5.u17.u20.gap.ob");
+    add_ip_name_from_string("233.130.124.21", "mcpitch.ny5.u21.u24.gap.ob");
+    add_ip_name_from_string("233.130.124.22", "mcpitch.ny5.u25.u28.gap.ob");
+    add_ip_name_from_string("233.130.124.23", "mcpitch.ny5.u29.u32.gap.ob");
+
+    /* NY5 - BZX Options - WAN D - Realtime */
+    add_ip_name_from_string("233.130.124.32", "mcpitch.ny5.u1.u4.rt.od");
+    add_ip_name_from_string("233.130.124.33", "mcpitch.ny5.u5.u8.rt.od");
+    add_ip_name_from_string("233.130.124.34", "mcpitch.ny5.u9.u12.rt.od");
+    add_ip_name_from_string("233.130.124.35", "mcpitch.ny5.u13.u16.rt.od");
+    add_ip_name_from_string("233.130.124.36", "mcpitch.ny5.u17.u20.rt.od");
+    add_ip_name_from_string("233.130.124.37", "mcpitch.ny5.u21.u24.rt.od");
+    add_ip_name_from_string("233.130.124.38", "mcpitch.ny5.u25.u28.rt.od");
+    add_ip_name_from_string("233.130.124.39", "mcpitch.ny5.u29.u32.rt.od");
+
+    /* NY5 - BZX Options - WAN D - Gap */
+    add_ip_name_from_string("233.130.124.48", "mcpitch.ny5.u1.u4.gap.od");
+    add_ip_name_from_string("233.130.124.49", "mcpitch.ny5.u5.u8.gap.od");
+    add_ip_name_from_string("233.130.124.50", "mcpitch.ny5.u9.u12.gap.od");
+    add_ip_name_from_string("233.130.124.51", "mcpitch.ny5.u13.u16.gap.od");
+    add_ip_name_from_string("233.130.124.52", "mcpitch.ny5.u17.u20.gap.od");
+    add_ip_name_from_string("233.130.124.53", "mcpitch.ny5.u21.u24.gap.od");
+    add_ip_name_from_string("233.130.124.54", "mcpitch.ny5.u25.u28.gap.od");
+    add_ip_name_from_string("233.130.124.55", "mcpitch.ny5.u29.u32.gap.od");
+
+    /* CH4 - BZX Options - WAN E - Realtime */
+    add_ip_name_from_string("233.19.3.96",  "mcpitch.ch4.u1.u4.rt.oe");
+    add_ip_name_from_string("233.19.3.98",  "mcpitch.ch4.u5.u8.rt.oe");
+    add_ip_name_from_string("233.19.3.100", "mcpitch.ch4.u9.u12.rt.oe");
+    add_ip_name_from_string("233.19.3.102", "mcpitch.ch4.u13.u16.rt.oe");
+    add_ip_name_from_string("233.19.3.104", "mcpitch.ch4.u17.u20.rt.oe");
+    add_ip_name_from_string("233.19.3.106", "mcpitch.ch4.u21.u24.rt.oe");
+    add_ip_name_from_string("233.19.3.108", "mcpitch.ch4.u25.u28.rt.oe");
+    add_ip_name_from_string("233.19.3.110", "mcpitch.ch4.u29.u32.rt.oe");
+
+    /* CH4 - BZX Options - WAN E - Gap */
+    add_ip_name_from_string("233.19.3.97",  "mcpitch.ny5.u1.u4.gap.oe");
+    add_ip_name_from_string("233.19.3.99",  "mcpitch.ny5.u5.u8.gap.oe");
+    add_ip_name_from_string("233.19.3.101", "mcpitch.ny5.u9.u12.gap.oe");
+    add_ip_name_from_string("233.19.3.103", "mcpitch.ny5.u13.u16.gap.oe");
+    add_ip_name_from_string("233.19.3.105", "mcpitch.ny5.u17.u20.gap.oe");
+    add_ip_name_from_string("233.19.3.107", "mcpitch.ny5.u21.u24.gap.oe");
+    add_ip_name_from_string("233.19.3.109", "mcpitch.ny5.u25.u28.gap.oe");
+    add_ip_name_from_string("233.19.3.111", "mcpitch.ny5.u29.u32.gap.oe");
 }
