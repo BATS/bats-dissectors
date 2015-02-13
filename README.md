@@ -41,6 +41,18 @@ DISSECTOR_SRC.
 3. Rebuild. Note that you'll need GNU automake as the Makefiles will
 need to be regenerated.
 
+Windows Compilation
+-------------------
+
+Compiling Wireshark for Windows is pretty involved, but the Wireshark
+documentation covers it very well. The environment variables I have to
+set to use Visual Studio 2013 are in win_setup.bat.
+
+Copy the packet-mcastpitch.c file into epan/dissectors. Edit
+config.nmake and edit VERSION_EXTRA to include "-bats1". Build.
+
+See below for binaries.
+
 Testing
 -------
 
@@ -66,9 +78,14 @@ decode this:
 Binaries
 --------
 
-I expect to make available a Windows installer and RPMs for SuSE Linux
-Enterprise Server (SLES) and RedHat Enterprise Linux (RHEL). Stay
-tuned.
+Because building for Windows is so painful, I've created a binary
+package which contains support for Multicast PITCH out of the box:
+
+[Wireshark 1.12.3-bats1 x86_64](http://crampton.me/wireshark/Wireshark-win64-1.12.3-bats1.exe)
+SHA1: 907c854a0e8aae9d8db18fd6a6d97e0642665795
+
+Linux binaries are a possibility in the future, but don't hold your
+breath.
 
 License
 -------
