@@ -1,8 +1,6 @@
 /* packet-batsboe.c
  * Routines for BATS Binary Order Entry (BOE).
- * Copyright 2010-2011, Eric Crampton <ecrampton@batstrading.com>
- *
- * $Id$
+ * Copyright 2010-2014, Eric Crampton <ecrampton@batstrading.com>
  *
  * Wireshark - Network traffic analyzer
  * By Gerald Combs <gerald@wireshark.org>
@@ -28,16 +26,10 @@
 #endif
 
 #include <glib.h>
+#include <stdio.h>
 
 #include <epan/packet.h>
 #include <epan/prefs.h>
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include <glib.h>
-#include <epan/packet.h>
 
 int proto_batsboe = -1;
 static dissector_handle_t batsboe_handle;
@@ -127,6 +119,20 @@ static int hf_batsboe_rejected_count                  = -1;
 static int hf_batsboe_attributed_quote                = -1;
 static int hf_batsboe_bulk_order_ids                  = -1;
 static int hf_batsboe_bulk_reject_reasons             = -1;
+static int hf_batsboe_corrected_size                  = -1;
+static int hf_batsboe_party_id                        = -1;
+static int hf_batsboe_contra_capacity                 = -1;
+static int hf_batsboe_ext_exec_inst                   = -1;
+static int hf_batsboe_party_role                      = -1;
+static int hf_batsboe_trade_report_type_return        = -1;
+static int hf_batsboe_trade_publish_ind_return        = -1;
+static int hf_batsboe_large_size                      = -1;
+static int hf_batsboe_fee_code                        = -1;
+static int hf_batsboe_echo_text                       = -1;
+static int hf_batsboe_stop_px                         = -1;
+static int hf_batsboe_rout_strategy                   = -1;
+static int hf_batsboe_route_delivery_method           = -1;
+static int hf_batsboe_ex_destination                  = -1;
 
 static gint ett_batsboe = -1;
 static gint ett_batsboe_return_bitfields = -1;
@@ -301,6 +307,123 @@ dissect_login_request_message(tvbuff_t *tvb, proto_tree *tree, gint *offset)
 
     *offset += message_size;
 
+    return 1;
+}
+
+static gboolean
+dissect_unit_sequences_param_group(proto_tree *login_tree, tvbuff_t *tvb, gint offset, guint16 param_group_length)
+{
+    static const int MINIMUM_LENGTH = 5;
+    static const int LENGTH_PER_UNIT = 5;
+
+    proto_item *group_item;
+    proto_tree *group_tree;
+    guint8 number_of_units;
+    
+    if (tvb_length_remaining(tvb, offset) < MINIMUM_LENGTH) {
+        return FALSE; /* smaller than minimum size */
+    }
+
+    number_of_units = tvb_get_guint8(tvb, offset + 4);
+    
+    group_item = proto_tree_add_protocol_format(
+            login_tree, proto_batsboe, tvb,
+            offset, param_group_length, "Unit Sequences Parameter Group (0x%x)", 0x80);
+
+    group_tree = proto_item_add_subtree(group_item, ett_batsboe);
+    proto_tree_add_item(group_tree, hf_batsboe_no_unspecified_unit_replay, tvb, offset + 3, 1, TRUE);
+
+    if (tvb_length_remaining(tvb, offset + 5) < number_of_units * LENGTH_PER_UNIT) {
+        return FALSE; /* not enough data for number of units expected */
+    }
+
+    if (param_group_length != (MINIMUM_LENGTH + number_of_units * LENGTH_PER_UNIT)) {
+        return FALSE; /* parameter group length not correct for number of units expected */
+    }
+
+    proto_tree_add_unit_sequences(group_tree, tvb, offset + 4);
+
+    return TRUE;
+}
+
+static void
+dissect_return_bitfields_param_group(proto_tree *msg_tree, tvbuff_t *tvb, gint offset)
+{
+
+}
+
+static guint8
+dissect_login_request_v2_message(tvbuff_t *tvb, proto_tree *tree, gint *offset)
+{
+    proto_item *msg_item;
+    proto_tree *msg_tree;
+    guint16 message_size;
+    guint8 num_param_groups;
+    guint8 current_param_group;
+    gint current_offset;
+    
+    if (tvb_length_remaining(tvb, *offset) < LOGIN_REQUEST_V2_MIN_LEN) {
+        return 0;
+    }
+
+    message_size = tvb_get_guint8(tvb, *offset + 2);
+
+    msg_item = proto_tree_add_protocol_format(
+            tree, proto_batsboe, tvb,
+            *offset, message_size, "Login Request V2");
+
+    msg_tree = proto_item_add_subtree(msg_item, ett_batsboe);
+
+    proto_tree_add_item(msg_tree, hf_batsboe_session_sub_id, tvb, *offset + 10, 4,  TRUE);
+    proto_tree_add_item(msg_tree, hf_batsboe_username,       tvb, *offset + 14, 4,  TRUE);
+    proto_tree_add_item(msg_tree, hf_batsboe_password,       tvb, *offset + 18, 10, TRUE);
+    
+    num_param_groups = tvb_get_guint8(tvb, *offset + 28);
+    printf("#of param groups: %u\n", num_param_groups);
+    
+    current_offset = *offset + 29;
+    
+    for (current_param_group = 0; current_param_group < num_param_groups; ++current_param_group) {
+        guint16 param_group_length;
+        guint8 param_group_type;
+
+        if (tvb_length_remaining(tvb, current_offset) < 3) {
+            return 0;
+        }
+        param_group_length = tvb_get_letohs(tvb, current_offset);
+        
+        if (tvb_length_remaining(tvb, current_offset) < param_group_length) {
+            /* insufficient bytes remaining */
+            printf("short [%u]: %u < %u\n", current_param_group, tvb_length_remaining(tvb, current_offset), param_group_length);
+            return 0;
+        }
+
+        param_group_type = tvb_get_guint8(tvb, current_offset + 2);
+        switch (param_group_type) {
+            case 0x80:
+                printf("dissect uspg\n");
+                /* TODO: retval */ dissect_unit_sequences_param_group(msg_tree, tvb, current_offset, param_group_length);
+                break;
+
+            case 0x81:
+                printf("dissect rbpg\n");
+                /* TODO: retval */ dissect_return_bitfields_param_group(msg_tree, tvb, current_offset);
+                break;
+
+            default:
+                break;
+        }
+
+        printf("%u + %u = %u\n", current_offset, param_group_length, current_offset + param_group_length);
+        current_offset += param_group_length;
+    }
+
+    /* if (current_offset != message_size) { */
+    /*     printf("size problem: %u != %u\n", current_offset, message_size); */
+    /* } */
+
+    *offset += message_size;
+    
     return 1;
 }
 
@@ -1202,6 +1325,10 @@ dissect_batsboe(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
                 result = dissect_bulk_order_ack_ext(tvb, batsboe_tree, &offset);
                 break;
 
+            case 0x37:
+                result = dissect_login_request_v2_message(tvb, batsboe_tree, &offset);
+                break;
+                
             default:
                 break;
         }
@@ -1256,6 +1383,7 @@ proto_register_batsboe(void)
             { &hf_batsboe_security_id,                   { "Security ID",                   "batsboe.security_id",              FT_STRING,  BASE_NONE,    NULL, 0x0, NULL, HFILL } },
             { &hf_batsboe_security_exchange,             { "Security Exchange",             "batsboe.security_exchange",        FT_STRING,  BASE_NONE,    NULL, 0x0, NULL, HFILL } },
             { &hf_batsboe_capacity,                      { "Capacity",                      "batsboe.capacity",                 FT_UINT8,   BASE_HEX,     boeCapacityStrings, 0x0, NULL, HFILL } },
+            { &hf_batsboe_contra_capacity,               { "Contra Capacity",               "batsboe.contra_capacity",          FT_UINT8,   BASE_HEX,     boeCapacityStrings, 0x0, NULL, HFILL } },
             { &hf_batsboe_cross_flag,                    { "Cross Flag",                    "batsboe.cross_flag",               FT_UINT8,   BASE_HEX,     boeCrossFlagStrings, 0x0, NULL, HFILL } },
             { &hf_batsboe_account,                       { "Account",                       "batsboe.account",                  FT_STRING,  BASE_NONE,    NULL, 0x0, NULL, HFILL } },
             { &hf_batsboe_clearing_firm,                 { "Clearing Firm",                 "batsboe.clearing_firm",            FT_STRING,  BASE_NONE,    NULL, 0x0, NULL, HFILL } },
@@ -1309,6 +1437,12 @@ proto_register_batsboe(void)
             { &hf_batsboe_ask_open_close,                { "Ask Open Close",                "batsboe.ask_open_close",           FT_UINT8,   BASE_HEX,     boeOpenCloseStrings, 0x0, NULL, HFILL } },
             { &hf_batsboe_accepted_count,                { "Accepted Count",                "batsboe.accepted_count",           FT_UINT16,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
             { &hf_batsboe_rejected_count,                { "Rejected Count",                "batsboe.rejected_count",           FT_UINT16,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_corrected_size,                { "Corrected Size",                "batsboe.corrected_size",           FT_UINT32,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_party_id,                      { "Party ID",                      "batsboe.party_id",                 FT_STRING,  BASE_NONE,    NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_attributed_quote,              { "Attributed Quote",              "batsboe.attributed_quote",         FT_UINT8,   BASE_HEX,     boeAttributedQuoteStrings, 0x0, NULL, HFILL } },
+            { &hf_batsboe_ext_exec_inst,                 { "Ext Exec Inst",                 "batsboe.ext_exec_inst",            FT_UINT8,   BASE_HEX,     boeExtExecInstStrings, 0x0, NULL, HFILL } },
+            { &hf_batsboe_party_role,                    { "Party Role",                    "batsboe.party_role",               FT_UINT8,   BASE_HEX,     boePartyRoleStrings, 0x0, NULL, HFILL } },
+            { &hf_batsboe_large_size,                    { "Large Size" ,                   "batsboe.large_size",               FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
     };
 
     static gint *ett[] = {

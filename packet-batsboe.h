@@ -3,6 +3,7 @@
 
 static const gint MESSAGE_HEADER_LEN                = 10;
 static const gint LOGIN_REQUEST_MIN_LEN             = 118;
+static const gint LOGIN_REQUEST_V2_MIN_LEN          = 29;
 static const gint LOGIN_RESPONSE_MIN_LEN            = 165;
 static const gint REPLAY_COMPLETE_LEN               = 10;
 static const gint ORDER_CANCELLED_MIN_LEN           = 47;
@@ -32,9 +33,29 @@ static const value_string boeMessageTypeStrings[] = {
     { 0x15, "Bulk Order Acknowledgement" },
     { 0x1C, "Bulk Order Extended" },
     { 0x1D, "Bulk Order Acknowledgement Extended" },
+    { 0x24, "Login Response V2" },
+    { 0x25, "Order Acknowledgment V2" },
+    { 0x26, "Order Rejected V2" },
+    { 0x27, "Order Modified V2" },
+    { 0x28, "Order Restated V2" },
+    { 0x29, "User Modify Rejected V2" },
+    { 0x2A, "Order Cancelled V2" },
+    { 0x2B, "Cancel Rejected V2" },
+    { 0x2C, "Order Execution V2" },
+    { 0x2D, "Trade Cancel or Correct V2" },
+    { 0x37, "Login Request V2" },
+    { 0x38, "New Order V2" },
+    { 0x39, "Cancel Order V2" },
+    { 0x3A, "Modify Order V2" },
     { 0, NULL },
 };
 
+static const value_string boe_param_group_strings[] = {
+    { 0x80, "Unit Sequences Parameter Group" },
+    { 0x81, "Return Bitfields Parameter Group" },
+    { 0, NULL },
+};    
+    
 static const value_string boeNoUnspecifiedUnitReplayStrings[] = {
     { 0x00, "False (Replay Unspecified Units)" },
     { 0x01, "True (Suppress Unspecified Units Replay)" },
@@ -50,6 +71,7 @@ static const value_string boeLoginResponseStatusStrings[] = {
     { 'Q', "Sequence Ahead in Login Message" },
     { 'I', "Invalid Unit Given in Login Message" },
     { 'F', "Invalid Return Bitfield in Login Message" },
+    { 'M', "Invalid Login Request Message Structure" },
     { 0, NULL },
 };
 
@@ -67,9 +89,18 @@ static const value_string boeCancelReasonStrings[] = {
     { 0, NULL },
 };
 
+static const value_string boeAttributedQuoteStrings[] = {
+    { 'N', "Not Attributed" },
+    { 'Y', "Attributed" },
+    { 'R', "Attributed (Retail - RTAL)"},
+    { 0, NULL },
+};
+
 static const value_string boeSideStrings[] = {
     { '1', "Buy" },
     { '2', "Sell" },
+    { '5', "Sell Short" },
+    { '6', "Sell Short Exempt" },
     { 0, NULL },
 };
 
@@ -88,10 +119,25 @@ static const value_string boeExecInstStrings[] = {
     { 0, NULL },
 };
 
+static const value_string boeExtExecInstStrings[] = {
+    { 'N', "None" },
+    { 'R', "Retail Order" },
+    { 'P', "Retail Order - Price Improving Only" },
+    { 'T', "Retail Price Improving Order" },
+    { 0, NULL },
+};
+
 static const value_string boeOrdTypeStrings[] = {
     { '1', "Market" },
     { '2', "Limit" },
     { 'P', "Pegged" },
+    { 0, NULL },
+};
+
+static const value_string boePartyRoleStrings[] = {
+    { '1', "Executing Firm" },
+    { '2', "Entering Firm" },
+    { '3', "Contra Firm" },
     { 0, NULL },
 };
 
@@ -298,9 +344,9 @@ static bit_type_definition return_bits_4[] = {
     { "PutOrCall",              &hf_batsboe_put_or_call,              1,  bft_default },
     { "OpenClose",              &hf_batsboe_open_close,               1,  bft_default },
     { "ClOrdIDBatch",           &hf_batsboe_cl_ord_id_batch,          20, bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
+    { "CorrectedSize",          &hf_batsboe_corrected_size,           4,  bft_default },
+    { "PartyID",                &hf_batsboe_party_id,                 4,  bft_default },
+    { "AccessFee",              &hf_batsboe_access_fee,               8,  bft_default },
 };
 
 static bit_type_definition return_bits_5[] = {
@@ -317,33 +363,33 @@ static bit_type_definition return_bits_5[] = {
 static bit_type_definition return_bits_6[] = {
     { "SecondaryOrderID",       &hf_batsboe_secondary_order_id,       8,  bft_base36 },
     { "CCP",                    &hf_batsboe_ccp,                      4,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
+    { "ContraCapacity",         &hf_batsboe_contra_capacity,          1,  bft_default },
+    { "AttributedQuote",        &hf_batsboe_attributed_quote,         1,  bft_default },
+    { "ExtExecInst",            &hf_batsboe_ext_exec_inst,            1,  bft_default },
     { "BulkOrderIds",           &hf_batsboe_bulk_order_ids,           8,  bft_base36 },
     { "BulkRejectReasons",      &hf_batsboe_bulk_reject_reasons,      1,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
+    { "PartyRole",              &hf_batsboe_party_role,               1,  bft_default },
 };
 
 static bit_type_definition return_bits_7[] = {
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
+    { "SubLiquidityIndicator",  &hf_batsboe_sub_liquidity_indicator,  1,  bft_default },
+    { "TradeReportTypeReturn",  &hf_batsboe_trade_report_type_return, 0,  bft_default }, //TODO
+    { "TradePublishIndReturn",  &hf_batsboe_trade_publish_ind_return, 0,  bft_default }, //TODO
+    { "Text",                   &hf_batsboe_text,                     60, bft_default },
+    { "Bid",                    &hf_batsboe_bid_short_price,          4,  bft_default },
+    { "Offer",                  &hf_batsboe_ask_short_price,          4,  bft_default },
+    { "LargeSize",              &hf_batsboe_large_size,               8,  bft_default },
     { "<Reserved>",             0,                                    0,  bft_default },
 };
 
 static bit_type_definition return_bits_8[] = {
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
-    { "<Reserved>",             0,                                    0,  bft_default },
+    { "FeeCode",                &hf_batsboe_fee_code,                 0,  bft_default }, //TODO
+    { "EchoText",               &hf_batsboe_echo_text,                0,  bft_default }, //TODO
+    { "StopPx",                 &hf_batsboe_stop_px,                  0,  bft_default }, //TODO
+    { "RoutingInst",            &hf_batsboe_routing_inst,             0,  bft_default }, //TODO
+    { "RoutStrategy",           &hf_batsboe_rout_strategy,            0,  bft_default }, //TODO
+    { "RouteDeliveryMethod",    &hf_batsboe_route_delivery_method,    0,  bft_default }, //TODO
+    { "ExDestination",          &hf_batsboe_ex_destination,           0,  bft_default }, //TODO
     { "<Reserved>",             0,                                    0,  bft_default },
 };
 
