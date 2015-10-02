@@ -78,6 +78,7 @@ static int hf_mcastpitch_auction_type             = -1;
 static int hf_mcastpitch_reference_price          = -1;
 static int hf_mcastpitch_buy_shares               = -1;
 static int hf_mcastpitch_sell_shares              = -1;
+static int hf_mcastpitch_indicative_shares        = -1;
 static int hf_mcastpitch_indicative_price         = -1;
 static int hf_mcastpitch_auction_only_price       = -1;
 static int hf_mcastpitch_sequence                 = -1;
@@ -111,6 +112,8 @@ static int hf_mcastpitch_trade_flags              = -1;
 static int hf_mcastpitch_execution_flags          = -1;
 static int hf_mcastpitch_statistic_type           = -1;
 static int hf_mcastpitch_price_determination      = -1;
+static int hf_mcastpitch_outside_tolerance        = -1;
+static int hf_mcastpitch_includes_primary         = -1;
 
 static gint ett_mcastpitch = -1;
 
@@ -154,6 +157,7 @@ static const gint SPIN_REQUEST_MESSAGE_LEN                    = 6;
 static const gint SPIN_RESPONSE_MESSAGE_LEN                   = 11;
 static const gint SPIN_FINISHED_MESSAGE_LEN                   = 6;
 static const gint AUCTION_UPDATE_MESSAGE_LEN                  = 47;
+static const gint AUCTION_UPDATE_EU_MESSAGE_LEN               = 37;
 static const gint AUCTION_SUMMARY_MESSAGE_LEN                 = 27;
 static const gint UNIT_CLEAR_MESSAGE_LEN                      = 6;
 static const gint RETAIL_PRICE_IMPROVEMENT_MESSAGE_LEN        = 15;
@@ -193,15 +197,31 @@ static const value_string options_symbol_condition[] = {
     { 0, NULL },
 };
 
+static const value_string outside_tolerance[] = {
+    { 'O', "'O' Outside tolerance" },
+    { 'I', "'I' Inside tolerance" },
+    { '-', "- Not Specified" },
+    { 0, NULL },
+
+};
+
+ static const value_string includes_primary[] = {
+    { 'P', "'P' Includes Primary" },
+    { 'N', "'N' Excludes Primary" },
+    { '-', "- Not Specified" },
+    { 0, NULL },
+};
+
 static const value_string auction_type[] = {
     { 'O', "'O' Opening Auction" },
     { 'C', "'C' Closing Auction" },
     { 'H', "'H' Halt Auction" },
     { 'I', "'I' IPO Auction" },
     { 'V', "'V' Volatility Auction" },
+    { 'P', "'P' Periodic Auction" },
     { 0, NULL },
 };
- 
+
 static const value_string statistic_type[] = {
     { 'C', "'C' Closing Price" },
     { 'H', "'H' High Price" },
@@ -1319,6 +1339,37 @@ dissect_auction_update_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
 }
 
 static guint8
+dissect_auction_update_eu_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
+{
+    proto_item *msg_item;
+    proto_tree *msg_tree;
+
+    if (tvb_length_remaining(tvb, *offset) < AUCTION_UPDATE_EU_MESSAGE_LEN) {
+        return 0;
+    }
+
+    msg_item = proto_tree_add_protocol_format(
+            tree, proto_mcastpitch, tvb,
+            *offset, AUCTION_UPDATE_EU_MESSAGE_LEN, "Auction Update EU");
+
+    msg_tree = proto_item_add_subtree(msg_item, ett_mcastpitch);
+
+    proto_tree_add_item      (msg_tree, hf_mcastpitch_msg_length,         tvb, *offset,      1, TRUE);
+    proto_tree_add_item      (msg_tree, hf_mcastpitch_msg_type,           tvb, *offset + 1,  1, TRUE);
+    proto_tree_add_item      (msg_tree, hf_mcastpitch_time_offset,        tvb, *offset + 2,  4, TRUE);
+    proto_tree_add_item      (msg_tree, hf_mcastpitch_symbol8,            tvb, *offset + 6,  8, TRUE);
+    proto_tree_add_item      (msg_tree, hf_mcastpitch_auction_type,       tvb, *offset + 14, 1, TRUE);
+    proto_tree_add_long_price(msg_tree, hf_mcastpitch_reference_price,    tvb, *offset + 15);
+    proto_tree_add_long_price(msg_tree, hf_mcastpitch_indicative_price,   tvb, *offset + 23);
+    proto_tree_add_item      (msg_tree, hf_mcastpitch_indicative_shares,  tvb, *offset + 31, 4, TRUE);
+    proto_tree_add_item      (msg_tree, hf_mcastpitch_outside_tolerance,  tvb, *offset + 35, 1, TRUE);
+    proto_tree_add_item      (msg_tree, hf_mcastpitch_includes_primary,   tvb, *offset + 36, 1, TRUE);
+
+    *offset = *offset + AUCTION_UPDATE_EU_MESSAGE_LEN;
+    return 1;
+}
+
+static guint8
 dissect_auction_summary_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
 {
     proto_item *msg_item;
@@ -1673,9 +1724,13 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *da
             case 0x90:
                 result = dissect_latency_stat_message(tvb, tree, &offset);
                 break;
-                
+
             case 0x95:
                 result = dissect_auction_update_message(tvb, tree, &offset);
+                break;
+
+            case 0xAC:
+                result = dissect_auction_update_eu_message(tvb, tree, &offset);
                 break;
 
             case 0x96:
@@ -1753,6 +1808,7 @@ proto_register_mcastpitch(void)
         { &hf_mcastpitch_reference_price,          { "Reference Price",          "mcastpitch.reference_price",          FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_buy_shares,               { "Buy Shares",               "mcastpitch.buy_shares",               FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_sell_shares,              { "Sell Shares",              "mcastpitch.sell_shares",              FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
+        { &hf_mcastpitch_indicative_shares,        { "Indicative Shares",        "mcastpitch.indicative_shares",        FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_indicative_price,         { "Indicative Price",         "mcastpitch.indicative_price",         FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_auction_only_price,       { "Auction Only Price",       "mcastpitch.auction_only_price",       FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_gap_response_status,      { "Gap Response Status",      "mcastpitch.gap_response_status",      FT_UINT8,  BASE_HEX,     gap_response_status,               0x0, NULL, HFILL } },
@@ -1786,6 +1842,8 @@ proto_register_mcastpitch(void)
         { &hf_mcastpitch_execution_flags,          { "Execution Flags",          "mcastpitch.execution_flags",          FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_statistic_type,           { "Statistic Type",           "mcastpitch.statistic_type",           FT_UINT8,  BASE_DEC,     statistic_type,                    0x0, NULL, HFILL } },
         { &hf_mcastpitch_price_determination,      { "Price Determination",      "mcastpitch.price_determination",      FT_UINT8,  BASE_DEC,     price_determination,               0x0, NULL, HFILL } },
+        { &hf_mcastpitch_outside_tolerance,        { "Outside tolerance",        "mcastpitch.outside_tolerance",        FT_UINT8,  BASE_HEX,     outside_tolerance,                 0x0, NULL, HFILL } },
+        { &hf_mcastpitch_includes_primary,         { "Includes Primary",         "mcastpitch.includes_primary",         FT_UINT8,  BASE_HEX,     includes_primary,                  0x0, NULL, HFILL } },
     };
 
     static gint *ett[] = {
