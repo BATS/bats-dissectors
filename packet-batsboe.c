@@ -1443,8 +1443,16 @@ proto_register_batsboe(void)
             { &hf_batsboe_ext_exec_inst,                 { "Ext Exec Inst",                 "batsboe.ext_exec_inst",            FT_UINT8,   BASE_HEX,     boeExtExecInstStrings, 0x0, NULL, HFILL } },
             { &hf_batsboe_party_role,                    { "Party Role",                    "batsboe.party_role",               FT_UINT8,   BASE_HEX,     boePartyRoleStrings, 0x0, NULL, HFILL } },
             { &hf_batsboe_large_size,                    { "Large Size" ,                   "batsboe.large_size",               FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
-    };
+            { &hf_batsboe_fee_code,                      { "Fee Code" ,                     "batsboe.fee_code",                 FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_route_delivery_method,         { "RouteDeliveryMethod" ,          "batsboe.route_delivery_method",    FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_echo_text,                     { "EchoText" ,                     "batsboe.echo_text",                FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_stop_px,                       { "StopPx" ,                       "batsboe.stop_px",                  FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_trade_report_type_return,      { "TradeReportTypeReturn" ,        "batsboe.trade_report_type_return", FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_trade_publish_ind_return,      { "TradePublishIndReturn" ,        "batsboe.trade_publish_ind_return", FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_rout_strategy,                 { "RoutStrategy" ,                 "batsboe.rout_strategy",            FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
+            { &hf_batsboe_ex_destination,                { "ExDestination" ,                "batsboe.ex_destination",           FT_UINT64,  BASE_DEC,     NULL, 0x0, NULL, HFILL } },
 
+    };
     static gint *ett[] = {
             &ett_batsboe,
             &ett_batsboe_return_bitfields,
