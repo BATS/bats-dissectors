@@ -22,9 +22,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifdef HAVE_CONFIG_H
 # include "config.h"
-#endif
 
 #include <glib.h>
 
@@ -36,7 +34,8 @@
 #include <epan/prefs.h>
 
 int proto_mcastpitch = -1;
-static dissector_handle_t mcastpitch_handle;
+static dissector_handle_t mcastpitch_handle_udp;
+static dissector_handle_t mcastpitch_handle_tcp;
 
 static int hf_mcastpitch_hdr_length               = -1;
 static int hf_mcastpitch_hdr_count                = -1;
@@ -348,7 +347,7 @@ dissect_login_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *m_item;
     proto_tree *m_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < LOGIN_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < LOGIN_MESSAGE_LEN) {
         return 0;
     }
     
@@ -376,7 +375,7 @@ dissect_login_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *m_item;
     proto_tree *m_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < LOGIN_RESPONSE_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < LOGIN_RESPONSE_MESSAGE_LEN) {
         return 0;
     }
     
@@ -401,7 +400,7 @@ dissect_gap_request_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *m_item;
     proto_tree *m_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < GAP_REQUEST_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < GAP_REQUEST_MESSAGE_LEN) {
         return 0;
     }
     
@@ -428,7 +427,7 @@ dissect_gap_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *m_item;
     proto_tree *m_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < GAP_RESPONSE_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < GAP_RESPONSE_MESSAGE_LEN) {
         return 0;
     }
     
@@ -456,7 +455,7 @@ dissect_time_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *m_item;
     proto_tree *m_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < TIME_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < TIME_MESSAGE_LEN) {
         return 0;
     }
     
@@ -481,7 +480,7 @@ dissect_add_order_long_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
     
-    if (tvb_length_remaining(tvb, *offset) < ADD_ORDER_LONG_US_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < ADD_ORDER_LONG_US_MESSAGE_LEN) {
         return 0;
     }
 
@@ -512,7 +511,7 @@ dissect_add_order_long_eu_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
     
-    if (tvb_length_remaining(tvb, *offset) < ADD_ORDER_LONG_EU_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < ADD_ORDER_LONG_EU_MESSAGE_LEN) {
         return 0;
     }
 
@@ -663,7 +662,7 @@ dissect_reduce_size_long_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < REDUCE_SIZE_LONG_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < REDUCE_SIZE_LONG_MESSAGE_LEN) {
         return 0;
     }
 
@@ -690,7 +689,7 @@ dissect_reduce_size_short_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < REDUCE_SIZE_SHORT_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < REDUCE_SIZE_SHORT_MESSAGE_LEN) {
         return 0;
     }
 
@@ -795,7 +794,7 @@ dissect_delete_order_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < DELETE_ORDER_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < DELETE_ORDER_MESSAGE_LEN) {
         return 0;
     }
 
@@ -821,7 +820,7 @@ dissect_trade_long_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < TRADE_LONG_US_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < TRADE_LONG_US_MESSAGE_LEN) {
         return 0;
     }
 
@@ -852,7 +851,7 @@ dissect_trade_long_eu_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < TRADE_LONG_EU_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < TRADE_LONG_EU_MESSAGE_LEN) {
         return 0;
     }
 
@@ -926,7 +925,7 @@ dissect_trade_break_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < TRADE_BREAK_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < TRADE_BREAK_MESSAGE_LEN) {
         return 0;
     }
 
@@ -952,7 +951,7 @@ dissect_trade_report_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < TRADE_REPORT_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < TRADE_REPORT_MESSAGE_LEN) {
         return 0;
     }
 
@@ -985,7 +984,7 @@ dissect_statistics_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < STATISTICS_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < STATISTICS_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1014,7 +1013,7 @@ dissect_end_of_session_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < END_OF_SESSION_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < END_OF_SESSION_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1039,7 +1038,7 @@ dissect_symbol_mapping_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < SYMBOL_MAPPING_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < SYMBOL_MAPPING_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1108,7 +1107,7 @@ dissect_trade_expanded_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < TRADE_EXPANDED_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < TRADE_EXPANDED_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1139,7 +1138,7 @@ dissect_trading_status_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < TRADING_STATUS_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < TRADING_STATUS_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1169,7 +1168,7 @@ dissect_spin_image_available_message(tvbuff_t *tvb, proto_tree *tree, int *offse
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < SPIN_IMAGE_AVAILABLE_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < SPIN_IMAGE_AVAILABLE_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1194,7 +1193,7 @@ dissect_spin_request_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < SPIN_REQUEST_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < SPIN_REQUEST_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1219,7 +1218,7 @@ dissect_spin_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < SPIN_RESPONSE_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < SPIN_RESPONSE_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1246,7 +1245,7 @@ dissect_spin_finished_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < SPIN_FINISHED_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < SPIN_FINISHED_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1271,7 +1270,7 @@ dissect_latency_stat_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < LATENCY_STAT_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < LATENCY_STAT_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1312,7 +1311,7 @@ dissect_auction_update_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < AUCTION_UPDATE_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < AUCTION_UPDATE_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1344,7 +1343,7 @@ dissect_auction_update_eu_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < AUCTION_UPDATE_EU_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < AUCTION_UPDATE_EU_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1375,7 +1374,7 @@ dissect_auction_summary_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < AUCTION_SUMMARY_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < AUCTION_SUMMARY_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1450,7 +1449,7 @@ dissect_unit_clear_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < UNIT_CLEAR_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < UNIT_CLEAR_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1475,7 +1474,7 @@ dissect_retail_price_improvement_message(tvbuff_t *tvb, proto_tree *tree, int *o
     proto_item *msg_item;
     proto_tree *msg_tree;
 
-    if (tvb_length_remaining(tvb, *offset) < RETAIL_PRICE_IMPROVEMENT_MESSAGE_LEN) {
+    if (tvb_captured_length_remaining(tvb, *offset) < RETAIL_PRICE_IMPROVEMENT_MESSAGE_LEN) {
         return 0;
     }
 
@@ -1497,7 +1496,7 @@ dissect_retail_price_improvement_message(tvbuff_t *tvb, proto_tree *tree, int *o
 }
 
 static int
-dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
+dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gboolean is_udp)
 {
     gint bytes, offset = 0;
     proto_item *item, *sequence_item;
@@ -1507,7 +1506,7 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *da
     guint32 hdr_sequence;
     mcp_analysis_t *mcpa;
     
-    bytes = tvb_length_remaining(tvb, 0);
+    bytes = tvb_captured_length_remaining(tvb, 0);
 
     if (bytes < SEQUENCED_UNIT_HEADER_LEN) {
         /* There aren't enough bytes to even decode the header. This must be malformed data. */
@@ -1529,13 +1528,16 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *da
 
     /* Perform the MCP packet analysis (but only on the first run through the capture) */
     if (!pinfo->fd->flags.visited) {
-        if (pinfo->ipproto == IP_PROTO_UDP && mcpa->next_sequence && mcpa->next_sequence != hdr_sequence) {
+        if (is_udp && 0 != hdr_sequence && mcpa->next_sequence && mcpa->next_sequence != hdr_sequence) {
             /* Gap detected, make a note of the details for display in the UI later */
             mcp_analysis_get_frame_data(pinfo->fd->num, TRUE, mcpa);
             mcpa->fd->flags |= MCP_OUT_OF_SEQUENCE;
             mcpa->fd->expected_sequence = mcpa->next_sequence;
         }
-        mcpa->next_sequence = hdr_sequence + hdr_count;
+
+        if (0 != hdr_sequence) {
+            mcpa->next_sequence = hdr_sequence + hdr_count;
+        }
     }
 
     if (!tree) {
@@ -1595,7 +1597,7 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *da
         msg_length = tvb_get_guint8(tvb, offset);
         msg_type   = tvb_get_guint8(tvb, offset + 1);
 
-        if (msg_length > tvb_length_remaining(tvb, offset)) {
+        if (msg_length > tvb_captured_length_remaining(tvb, offset)) {
             /* Not enough data remaining for the supposed length. This must be malformed data. */
             return offset;
         }
@@ -1754,14 +1756,29 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *da
     return offset;
 }
 
+static gboolean
+dissect_mcastpitch_udp(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
+{
+    dissect_mcastpitch(tvb, pinfo, tree, TRUE);
+    return TRUE;
+}
+
+static gboolean
+dissect_mcastpitch_tcp(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
+{
+    dissect_mcastpitch(tvb, pinfo, tree, FALSE);
+    return TRUE;
+}
+
 void
 proto_reg_handoff_mcastpitch(void)
 {
-    heur_dissector_add("udp", dissect_mcastpitch, proto_mcastpitch);
-    heur_dissector_add("tcp", dissect_mcastpitch, proto_mcastpitch);
-    mcastpitch_handle = new_create_dissector_handle(dissect_mcastpitch, proto_mcastpitch);
-    dissector_add_handle("udp.port", mcastpitch_handle);
-    dissector_add_handle("tcp.port", mcastpitch_handle);
+    heur_dissector_add("udp", dissect_mcastpitch_udp, "Multicast Pitch", "mcastpitch", proto_mcastpitch, HEURISTIC_DISABLE);
+    heur_dissector_add("tcp", dissect_mcastpitch_tcp, "TCP Multicast Pitch", "tcppitch", proto_mcastpitch, HEURISTIC_DISABLE);
+    mcastpitch_handle_udp = new_create_dissector_handle(dissect_mcastpitch_udp, proto_mcastpitch);
+    mcastpitch_handle_tcp = new_create_dissector_handle(dissect_mcastpitch_tcp, proto_mcastpitch);
+    dissector_add_handle("udp.port", mcastpitch_handle_udp);
+    dissector_add_handle("tcp.port", mcastpitch_handle_tcp);
 }
 
 void
@@ -1860,8 +1877,6 @@ proto_register_mcastpitch(void)
             "Multicast PITCH",      /* name */
             "BATS Multicast PITCH", /* short name */
             "mcastpitch");          /* abbrev */
-
-    new_register_dissector("mcastpitch", dissect_mcastpitch, proto_mcastpitch);
 
     proto_register_field_array(proto_mcastpitch, hf, array_length(hf));
     proto_register_subtree_array(ett, array_length(ett));
