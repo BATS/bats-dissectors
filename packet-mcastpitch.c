@@ -60,6 +60,7 @@ static int hf_mcastpitch_remaining_shares         = -1;
 static int hf_mcastpitch_long_canceled_shares     = -1;
 static int hf_mcastpitch_short_canceled_shares    = -1;
 static int hf_mcastpitch_symbol8                  = -1;
+static int hf_mcastpitch_symbol_isin              = -1;
 static int hf_mcastpitch_add_flags                = -1;
 static int hf_mcastpitch_osi_symbol               = -1;
 static int hf_mcastpitch_session_sub_id           = -1;
@@ -128,8 +129,10 @@ static const gint ADD_ORDER_LONG_EU_MESSAGE_LEN               = 35;
 static const gint ADD_ORDER_LONG_US_MESSAGE_LEN               = 34;
 static const gint ADD_ORDER_SHORT_EU_MESSAGE_LEN              = 25;
 static const gint ADD_ORDER_SHORT_US_MESSAGE_LEN              = 26;
+static const gint ORDER_EXECUTED_EU_MMTV3_MESSAGE_LEN         = 30;
 static const gint ORDER_EXECUTED_EU_MESSAGE_LEN               = 29;
 static const gint ORDER_EXECUTED_US_MESSAGE_LEN               = 26;
+static const gint ORDER_EXECUTED_AT_PRICE_SIZE_EU_MMTV3_MESSAGE_LEN = 42;
 static const gint ORDER_EXECUTED_AT_PRICE_SIZE_EU_MESSAGE_LEN = 41;
 static const gint ORDER_EXECUTED_AT_PRICE_SIZE_US_MESSAGE_LEN = 38;
 static const gint REDUCE_SIZE_LONG_MESSAGE_LEN                = 18;
@@ -139,12 +142,17 @@ static const gint MODIFY_ORDER_LONG_US_MESSAGE_LEN            = 27;
 static const gint MODIFY_ORDER_SHORT_EU_MESSAGE_LEN           = 18;
 static const gint MODIFY_ORDER_SHORT_US_MESSAGE_LEN           = 19;
 static const gint DELETE_ORDER_MESSAGE_LEN                    = 14;
+static const gint TRADE_LONG_EU_MMTV3_MESSAGE_LEN             = 48;
 static const gint TRADE_LONG_EU_MESSAGE_LEN                   = 47;
 static const gint TRADE_LONG_US_MESSAGE_LEN                   = 41;
+static const gint TRADE_SHORT_EU_MMTV3_MESSAGE_LEN            = 38;
 static const gint TRADE_SHORT_EU_MESSAGE_LEN                  = 37;
 static const gint TRADE_SHORT_US_MESSAGE_LEN                  = 33;
 static const gint TRADE_BREAK_MESSAGE_LEN                     = 14;
+static const gint TRADE_REPORT_MMTV3_MESSAGE_LEN              = 68;
 static const gint TRADE_REPORT_MESSAGE_LEN                    = 64;
+static const gint TRADE_UNKNOWN_MMTV3_MESSAGE_LEN             = 72;
+static const gint TRADE_UNKNOWN_MESSAGE_LEN                   = 68;
 static const gint END_OF_SESSION_MESSAGE_LEN                  = 6;
 static const gint SYMBOL_MAPPING_MESSAGE_LEN                  = 30;
 static const gint TRADING_STATUS_MESSAGE_LEN                  = 18;
@@ -275,12 +283,12 @@ typedef struct mcp_frame_data{
 } mcp_frame_data_t;
 
 typedef struct mcp_analysis {
-    /* Next expected sequence number. */     
+    /* Next expected sequence number. */
     guint32 next_sequence;
 
     /* This pointer is NULL or points to a mcp_frame_data struct if this packet has "interesting" properties,
      * e.g., out-of-sequence.
-     */ 
+     */
     mcp_frame_data_t *fd;
 
     /* This structure contains a tree of "interesting" frame data keyed by the frame number. */
@@ -291,7 +299,7 @@ static void
 proto_tree_add_short_price(proto_tree *tree, int hf, tvbuff_t *tvb, int offset)
 {
     guint16 value = tvb_get_letohs(tvb, offset);
-    
+
     proto_tree_add_string_format_value(
             tree, hf, tvb, offset, 2, "",
             "%u = %u.%02u", value, value / 100, value % 100);
@@ -301,7 +309,7 @@ static void
 proto_tree_add_long_price(proto_tree *tree, int hf, tvbuff_t *tvb, int offset)
 {
     guint64 value = tvb_get_letoh64(tvb, offset);
-    
+
     proto_tree_add_string_format_value(
             tree, hf, tvb, offset, 8, "",
             "%lu = %lu.%04u", value, value / 10000, (unsigned) (value % 10000));
@@ -314,9 +322,9 @@ proto_tree_add_base36(proto_tree *tree, int hf, tvbuff_t *tvb, int offset)
     char buffer[13]; /* order IDs are 12 bytes, execution IDs are 9 bytes */
     char *op = buffer + 12;
     guint64 value = tvb_get_letoh64(tvb, offset);
-    
+
     *op-- = '\0';
-    
+
     do {
         *op-- = BASE36_DIGITS[value % 36];
         value /= 36;
@@ -350,7 +358,7 @@ dissect_login_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     if (tvb_captured_length_remaining(tvb, *offset) < LOGIN_MESSAGE_LEN) {
         return 0;
     }
-    
+
     m_item = proto_tree_add_protocol_format(
             tree, proto_mcastpitch, tvb,
             *offset, LOGIN_MESSAGE_LEN, "Login");
@@ -363,7 +371,7 @@ dissect_login_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(m_tree, hf_mcastpitch_username,       tvb, *offset + 6,  4, TRUE);
     proto_tree_add_item(m_tree, hf_mcastpitch_filler,         tvb, *offset + 10, 2, TRUE);
     proto_tree_add_item(m_tree, hf_mcastpitch_password,       tvb, *offset + 12, 10, TRUE);
-    
+
     *offset = *offset + LOGIN_MESSAGE_LEN;
 
     return 1;
@@ -378,7 +386,7 @@ dissect_login_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     if (tvb_captured_length_remaining(tvb, *offset) < LOGIN_RESPONSE_MESSAGE_LEN) {
         return 0;
     }
-    
+
     m_item = proto_tree_add_protocol_format(
             tree, proto_mcastpitch, tvb,
             *offset, LOGIN_RESPONSE_MESSAGE_LEN, "Login Response");
@@ -388,7 +396,7 @@ dissect_login_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(m_tree, hf_mcastpitch_msg_length,   tvb, *offset,      1, TRUE);
     proto_tree_add_item(m_tree, hf_mcastpitch_msg_type,     tvb, *offset + 1,  1, TRUE);
     proto_tree_add_item(m_tree, hf_mcastpitch_login_status, tvb, *offset + 2,  1, TRUE);
-    
+
     *offset = *offset + LOGIN_RESPONSE_MESSAGE_LEN;
 
     return 1;
@@ -403,7 +411,7 @@ dissect_gap_request_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     if (tvb_captured_length_remaining(tvb, *offset) < GAP_REQUEST_MESSAGE_LEN) {
         return 0;
     }
-    
+
     m_item = proto_tree_add_protocol_format(
             tree, proto_mcastpitch, tvb,
             *offset, GAP_REQUEST_MESSAGE_LEN, "Gap Request");
@@ -415,7 +423,7 @@ dissect_gap_request_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(m_tree, hf_mcastpitch_unit,       tvb, *offset + 2,  1, TRUE);
     proto_tree_add_item(m_tree, hf_mcastpitch_sequence,   tvb, *offset + 3,  4, TRUE);
     proto_tree_add_item(m_tree, hf_mcastpitch_count,      tvb, *offset + 7,  2, TRUE);
-    
+
     *offset = *offset + GAP_REQUEST_MESSAGE_LEN;
 
     return 1;
@@ -430,7 +438,7 @@ dissect_gap_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     if (tvb_captured_length_remaining(tvb, *offset) < GAP_RESPONSE_MESSAGE_LEN) {
         return 0;
     }
-    
+
     m_item = proto_tree_add_protocol_format(
             tree, proto_mcastpitch, tvb,
             *offset, GAP_RESPONSE_MESSAGE_LEN, "Gap Response");
@@ -443,7 +451,7 @@ dissect_gap_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(m_tree, hf_mcastpitch_sequence,            tvb, *offset + 3,  4, TRUE);
     proto_tree_add_item(m_tree, hf_mcastpitch_count,               tvb, *offset + 7,  2, TRUE);
     proto_tree_add_item(m_tree, hf_mcastpitch_gap_response_status, tvb, *offset + 9,  1, TRUE);
-    
+
     *offset = *offset + GAP_RESPONSE_MESSAGE_LEN;
 
     return 1;
@@ -458,7 +466,7 @@ dissect_time_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     if (tvb_captured_length_remaining(tvb, *offset) < TIME_MESSAGE_LEN) {
         return 0;
     }
-    
+
     m_item = proto_tree_add_protocol_format(
             tree, proto_mcastpitch, tvb,
             *offset, TIME_MESSAGE_LEN, "Time");
@@ -468,7 +476,7 @@ dissect_time_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(m_tree, hf_mcastpitch_msg_length, tvb, *offset,     1, TRUE);
     proto_tree_add_item(m_tree, hf_mcastpitch_msg_type,   tvb, *offset + 1, 1, TRUE);
     proto_tree_add_ssm (m_tree, hf_mcastpitch_time,       tvb, *offset + 2);
-    
+
     *offset = *offset + TIME_MESSAGE_LEN;
 
     return 1;
@@ -479,7 +487,7 @@ dissect_add_order_long_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
 {
     proto_item *msg_item;
     proto_tree *msg_tree;
-    
+
     if (tvb_captured_length_remaining(tvb, *offset) < ADD_ORDER_LONG_US_MESSAGE_LEN) {
         return 0;
     }
@@ -499,9 +507,9 @@ dissect_add_order_long_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item      (msg_tree, hf_mcastpitch_symbol6,       tvb, *offset + 19, 6, TRUE);
     proto_tree_add_long_price(msg_tree, hf_mcastpitch_long_price,    tvb, *offset + 25);
     proto_tree_add_item      (msg_tree, hf_mcastpitch_add_flags,     tvb, *offset + 33, 1, TRUE);
-    
+
     *offset = *offset + ADD_ORDER_LONG_US_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -510,7 +518,7 @@ dissect_add_order_long_eu_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
 {
     proto_item *msg_item;
     proto_tree *msg_tree;
-    
+
     if (tvb_captured_length_remaining(tvb, *offset) < ADD_ORDER_LONG_EU_MESSAGE_LEN) {
         return 0;
     }
@@ -531,7 +539,7 @@ dissect_add_order_long_eu_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_long_price(msg_tree, hf_mcastpitch_long_price,    tvb, *offset + 27);
 
     *offset = *offset + ADD_ORDER_LONG_EU_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -541,7 +549,7 @@ dissect_add_order_short_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_leng
     proto_item *msg_item;
     proto_tree *msg_tree;
     gboolean us_format;
-    
+
     if (msg_length == ADD_ORDER_SHORT_EU_MESSAGE_LEN) {
         us_format = FALSE;
     }
@@ -570,9 +578,9 @@ dissect_add_order_short_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_leng
     if (us_format) {
         proto_tree_add_item(msg_tree, hf_mcastpitch_add_flags, tvb, *offset + 25, 1, TRUE);
     }
-    
+
     *offset = *offset + msg_length;
-    
+
     return 1;
 }
 
@@ -582,8 +590,13 @@ dissect_order_executed_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_lengt
     proto_item *msg_item;
     proto_tree *msg_tree;
     gboolean us_format;
-    
-    if (msg_length == ORDER_EXECUTED_EU_MESSAGE_LEN) {
+    gboolean eu_mmtv3 = FALSE;
+
+    if (msg_length == ORDER_EXECUTED_EU_MMTV3_MESSAGE_LEN) {
+        eu_mmtv3 = TRUE;
+        us_format = FALSE;
+    }
+    else if (msg_length == ORDER_EXECUTED_EU_MESSAGE_LEN) {
         us_format = FALSE;
     }
     else if (msg_length == ORDER_EXECUTED_US_MESSAGE_LEN) {
@@ -607,11 +620,16 @@ dissect_order_executed_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_lengt
     proto_tree_add_base36(msg_tree, hf_mcastpitch_execution_id,    tvb, *offset + 18);
 
     if (!us_format) {
-        proto_tree_add_item(msg_tree, hf_mcastpitch_execution_flags, tvb, *offset + 26, 3, TRUE);
+        if (!eu_mmtv3) {
+            proto_tree_add_item(msg_tree, hf_mcastpitch_execution_flags, tvb, *offset + 26, 3, TRUE);
+        }
+        else {
+            proto_tree_add_item(msg_tree, hf_mcastpitch_execution_flags, tvb, *offset + 26, 4, TRUE);
+        }
     }
 
     *offset = *offset + msg_length;
-    
+
     return 1;
 }
 
@@ -621,8 +639,13 @@ dissect_order_executed_at_price_size_message(tvbuff_t *tvb, proto_tree *tree, gu
     proto_item *msg_item;
     proto_tree *msg_tree;
     gboolean us_format;
-    
-    if (msg_length == ORDER_EXECUTED_AT_PRICE_SIZE_EU_MESSAGE_LEN) {
+    gboolean eu_mmtv3 = FALSE;
+
+    if (msg_length == ORDER_EXECUTED_AT_PRICE_SIZE_EU_MMTV3_MESSAGE_LEN) {
+        eu_mmtv3 = TRUE;
+        us_format = FALSE;
+    }
+    else if (msg_length == ORDER_EXECUTED_AT_PRICE_SIZE_EU_MESSAGE_LEN) {
         us_format = FALSE;
     }
     else if (msg_length == ORDER_EXECUTED_AT_PRICE_SIZE_US_MESSAGE_LEN) {
@@ -648,11 +671,16 @@ dissect_order_executed_at_price_size_message(tvbuff_t *tvb, proto_tree *tree, gu
     proto_tree_add_long_price(msg_tree, hf_mcastpitch_long_price,       tvb, *offset + 30);
 
     if (!us_format) {
-        proto_tree_add_item(msg_tree, hf_mcastpitch_execution_flags, tvb, *offset + 38, 3, TRUE);
+        if (!eu_mmtv3) {
+            proto_tree_add_item(msg_tree, hf_mcastpitch_execution_flags, tvb, *offset + 38, 3, TRUE);
+        }
+        else {
+            proto_tree_add_item(msg_tree, hf_mcastpitch_execution_flags, tvb, *offset + 38, 4, TRUE);
+        }
     }
 
     *offset = *offset + msg_length;
-    
+
     return 1;
 }
 
@@ -679,7 +707,7 @@ dissect_reduce_size_long_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item  (msg_tree, hf_mcastpitch_long_canceled_shares, tvb, *offset + 14, 4, TRUE);
 
     *offset = *offset + REDUCE_SIZE_LONG_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -706,7 +734,7 @@ dissect_reduce_size_short_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item  (msg_tree, hf_mcastpitch_short_canceled_shares, tvb, *offset + 14, 2, TRUE);
 
     *offset = *offset + REDUCE_SIZE_SHORT_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -743,9 +771,9 @@ dissect_modify_order_long_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_le
     if (us_format) {
         proto_tree_add_item(msg_tree, hf_mcastpitch_add_flags, tvb, *offset + 26, 1, TRUE);
     }
-    
+
     *offset = *offset + msg_length;
-    
+
     return 1;
 }
 
@@ -782,9 +810,9 @@ dissect_modify_order_short_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_l
     if (us_format) {
         proto_tree_add_item(msg_tree, hf_mcastpitch_add_flags, tvb, *offset + 18, 1, TRUE);
     }
-    
+
     *offset = *offset + msg_length;
-    
+
     return 1;
 }
 
@@ -810,7 +838,7 @@ dissect_delete_order_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_base36(msg_tree, hf_mcastpitch_order_id,              tvb, *offset + 6);
 
     *offset = *offset + DELETE_ORDER_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -841,23 +869,29 @@ dissect_trade_long_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_base36    (msg_tree, hf_mcastpitch_execution_id,  tvb, *offset + 33);
 
     *offset = *offset + TRADE_LONG_US_MESSAGE_LEN;
-    
+
     return 1;
 }
 
 static guint8
-dissect_trade_long_eu_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
+dissect_trade_long_eu_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_length, int *offset)
 {
     proto_item *msg_item;
     proto_tree *msg_tree;
+    gboolean eu_mmtv3 = FALSE;
 
-    if (tvb_captured_length_remaining(tvb, *offset) < TRADE_LONG_EU_MESSAGE_LEN) {
+    if (msg_length == TRADE_LONG_EU_MMTV3_MESSAGE_LEN) {
+        eu_mmtv3 = TRUE;
+    }
+    else if (msg_length == TRADE_LONG_EU_MESSAGE_LEN) {
+    }
+    else {
         return 0;
     }
 
     msg_item = proto_tree_add_protocol_format(
             tree, proto_mcastpitch, tvb,
-            *offset, TRADE_LONG_EU_MESSAGE_LEN, "Trade (Long)");
+            *offset, msg_length, "Trade (Long)");
 
     msg_tree = proto_item_add_subtree(msg_item, ett_mcastpitch);
 
@@ -870,10 +904,16 @@ dissect_trade_long_eu_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item      (msg_tree, hf_mcastpitch_symbol8,       tvb, *offset + 19, 8, TRUE);
     proto_tree_add_long_price(msg_tree, hf_mcastpitch_long_price,    tvb, *offset + 27);
     proto_tree_add_base36    (msg_tree, hf_mcastpitch_execution_id,  tvb, *offset + 35);
-    proto_tree_add_item      (msg_tree, hf_mcastpitch_trade_flags,   tvb, *offset + 43, 4, TRUE);
 
-    *offset = *offset + TRADE_LONG_EU_MESSAGE_LEN;
-    
+    if (!eu_mmtv3) {
+        proto_tree_add_item  (msg_tree, hf_mcastpitch_trade_flags,   tvb, *offset + 43, 4, TRUE);
+    }
+    else {
+        proto_tree_add_item  (msg_tree, hf_mcastpitch_trade_flags,   tvb, *offset + 43, 5, TRUE);
+    }
+
+    *offset = *offset + msg_length;
+
     return 1;
 }
 
@@ -883,8 +923,13 @@ dissect_trade_short_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_length, 
     proto_item *msg_item;
     proto_tree *msg_tree;
     gboolean us_format;
+    gboolean eu_mmtv3 = FALSE;
 
-    if (msg_length == TRADE_SHORT_EU_MESSAGE_LEN) {
+    if (msg_length == TRADE_SHORT_EU_MMTV3_MESSAGE_LEN) {
+        eu_mmtv3 = TRUE;
+        us_format = FALSE;
+    }
+    else if (msg_length == TRADE_SHORT_EU_MESSAGE_LEN) {
         us_format = FALSE;
     }
     else if (msg_length == TRADE_SHORT_US_MESSAGE_LEN) {
@@ -911,11 +956,16 @@ dissect_trade_short_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_length, 
     proto_tree_add_base36     (msg_tree, hf_mcastpitch_execution_id,   tvb, *offset + 25);
 
     if (!us_format) {
-        proto_tree_add_item   (msg_tree, hf_mcastpitch_trade_flags,    tvb, *offset + 33, 4, TRUE);
+        if (!eu_mmtv3) {
+            proto_tree_add_item(msg_tree, hf_mcastpitch_trade_flags,   tvb, *offset + 33, 4, TRUE);
+        }
+        else {
+            proto_tree_add_item(msg_tree, hf_mcastpitch_trade_flags,   tvb, *offset + 33, 5, TRUE);
+        }
     }
 
     *offset = *offset + msg_length;
-    
+
     return 1;
 }
 
@@ -941,23 +991,29 @@ dissect_trade_break_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_base36(msg_tree, hf_mcastpitch_execution_id,   tvb, *offset + 6);
 
     *offset = *offset + TRADE_BREAK_MESSAGE_LEN;
-    
+
     return 1;
 }
 
 static guint8
-dissect_trade_report_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
+dissect_trade_report_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_length, int *offset)
 {
     proto_item *msg_item;
     proto_tree *msg_tree;
+    gboolean eu_mmtv3 = FALSE;
 
-    if (tvb_captured_length_remaining(tvb, *offset) < TRADE_REPORT_MESSAGE_LEN) {
+    if (msg_length == TRADE_REPORT_MMTV3_MESSAGE_LEN) {
+        eu_mmtv3 = TRUE;
+    }
+    else if (msg_length == TRADE_REPORT_MESSAGE_LEN) {
+    }
+    else {
         return 0;
     }
 
     msg_item = proto_tree_add_protocol_format(
             tree, proto_mcastpitch, tvb,
-            *offset, TRADE_REPORT_MESSAGE_LEN, "Trade Report");
+            *offset, msg_length, "Trade Report");
 
     msg_tree = proto_item_add_subtree(msg_item, ett_mcastpitch);
 
@@ -971,12 +1027,64 @@ dissect_trade_report_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item       (msg_tree, hf_mcastpitch_trade_time,         tvb, *offset + 38, 8, TRUE);
     proto_tree_add_item       (msg_tree, hf_mcastpitch_exec_venue,         tvb, *offset + 46, 4, TRUE);
     proto_tree_add_item       (msg_tree, hf_mcastpitch_traded_currency,    tvb, *offset + 50, 3, TRUE);
-    proto_tree_add_item       (msg_tree, hf_mcastpitch_trade_report_flags, tvb, *offset + 53, 11,TRUE);
 
-    *offset = *offset + TRADE_REPORT_MESSAGE_LEN;
+    if (!eu_mmtv3) {
+        proto_tree_add_item   (msg_tree, hf_mcastpitch_trade_report_flags, tvb, *offset + 53, 11,TRUE);
+    }
+    else {
+        proto_tree_add_item   (msg_tree, hf_mcastpitch_trade_report_flags, tvb, *offset + 53, 15,TRUE);
+    }
+
+    *offset = *offset + msg_length;
 
     return 1;
 }
+
+static guint8
+dissect_trade_unknown_message(tvbuff_t *tvb, proto_tree *tree, guint8 msg_length, int *offset)
+{
+    proto_item *msg_item;
+    proto_tree *msg_tree;
+    gboolean eu_mmtv3 = FALSE;
+
+    if (msg_length == TRADE_UNKNOWN_MMTV3_MESSAGE_LEN) {
+        eu_mmtv3 = TRUE;
+    }
+    else if (msg_length == TRADE_UNKNOWN_MESSAGE_LEN) {
+    }
+    else {
+        return 0;
+    }
+
+    msg_item = proto_tree_add_protocol_format(
+            tree, proto_mcastpitch, tvb,
+            *offset, msg_length, "Trade Unknown");
+
+    msg_tree = proto_item_add_subtree(msg_item, ett_mcastpitch);
+
+    proto_tree_add_item       (msg_tree, hf_mcastpitch_msg_length,         tvb, *offset,      1, TRUE);
+    proto_tree_add_item       (msg_tree, hf_mcastpitch_msg_type,           tvb, *offset + 1,  1, TRUE);
+    proto_tree_add_item       (msg_tree, hf_mcastpitch_time_offset,        tvb, *offset + 2,  4, TRUE);
+    proto_tree_add_item       (msg_tree, hf_mcastpitch_quantity8,          tvb, *offset + 6,  8, TRUE);
+    proto_tree_add_item       (msg_tree, hf_mcastpitch_symbol_isin,        tvb, *offset + 14, 12, TRUE);
+    proto_tree_add_long_price (msg_tree, hf_mcastpitch_long_price,         tvb, *offset + 26);
+    proto_tree_add_base36     (msg_tree, hf_mcastpitch_trade_id,           tvb, *offset + 34);
+    proto_tree_add_item       (msg_tree, hf_mcastpitch_trade_time,         tvb, *offset + 42, 8, TRUE);
+    proto_tree_add_item       (msg_tree, hf_mcastpitch_exec_venue,         tvb, *offset + 50, 4, TRUE);
+    proto_tree_add_item       (msg_tree, hf_mcastpitch_traded_currency,    tvb, *offset + 54, 3, TRUE);
+
+    *offset = *offset + TRADE_REPORT_MESSAGE_LEN;
+    if (!eu_mmtv3) {
+        proto_tree_add_item   (msg_tree, hf_mcastpitch_trade_report_flags, tvb, *offset + 57, 11,TRUE);
+    }
+    else {
+        proto_tree_add_item   (msg_tree, hf_mcastpitch_trade_report_flags, tvb, *offset + 57, 15,TRUE);
+    }
+
+    *offset = *offset + msg_length;
+
+     return 1;
+ }
 
 static guint8
 dissect_statistics_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
@@ -1028,7 +1136,7 @@ dissect_end_of_session_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_time_offset,    tvb, *offset + 2, 4, TRUE);
 
     *offset = *offset + END_OF_SESSION_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1055,7 +1163,7 @@ dissect_symbol_mapping_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_options_symbol_condition, tvb, *offset + 29, 1,  TRUE);
 
     *offset = *offset + SYMBOL_MAPPING_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1128,7 +1236,7 @@ dissect_trade_expanded_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_base36    (msg_tree, hf_mcastpitch_execution_id,  tvb, *offset + 35);
 
     *offset = *offset + TRADE_EXPANDED_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1158,7 +1266,7 @@ dissect_trading_status_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_reserved2,      tvb, *offset + 17, 1, TRUE);
 
     *offset = *offset + TRADING_STATUS_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1183,7 +1291,7 @@ dissect_spin_image_available_message(tvbuff_t *tvb, proto_tree *tree, int *offse
     proto_tree_add_item(msg_tree, hf_mcastpitch_sequence,       tvb, *offset + 2,  4, TRUE);
 
     *offset = *offset + SPIN_IMAGE_AVAILABLE_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1208,7 +1316,7 @@ dissect_spin_request_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_sequence,       tvb, *offset + 2,  4, TRUE);
 
     *offset = *offset + SPIN_REQUEST_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1235,7 +1343,7 @@ dissect_spin_response_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_spin_response_status, tvb, *offset + 10, 1, TRUE);
 
     *offset = *offset + SPIN_RESPONSE_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1260,7 +1368,7 @@ dissect_spin_finished_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_sequence,       tvb, *offset + 2,  4, TRUE);
 
     *offset = *offset + SPIN_FINISHED_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1301,7 +1409,7 @@ dissect_latency_stat_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item(msg_tree, hf_mcastpitch_25_percentile,      tvb, *offset + 104, 8, TRUE);
 
     *offset = *offset + LATENCY_STAT_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1333,7 +1441,7 @@ dissect_auction_update_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_long_price(msg_tree, hf_mcastpitch_auction_only_price, tvb, *offset + 39);
 
     *offset = *offset + AUCTION_UPDATE_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1393,7 +1501,7 @@ dissect_auction_summary_message(tvbuff_t *tvb, proto_tree *tree, int *offset)
     proto_tree_add_item      (msg_tree, hf_mcastpitch_executed_shares,    tvb, *offset + 23, 4, TRUE);
 
     *offset = *offset + AUCTION_SUMMARY_MESSAGE_LEN;
-    
+
     return 1;
 }
 
@@ -1435,7 +1543,7 @@ mcp_analysis_get_frame_data(guint32 frame, gboolean createflag, mcp_analysis_t *
     if (!mcpa) {
         return;
     }
-    
+
     mcpa->fd = (mcp_frame_data_t *)wmem_tree_lookup32(mcpa->frame_table, frame);
     if ((!mcpa->fd) && createflag) {
         mcpa->fd = wmem_new0(wmem_file_scope(), struct mcp_frame_data);
@@ -1505,7 +1613,7 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gboolean
     guint8 hdr_count;
     guint32 hdr_sequence;
     mcp_analysis_t *mcpa;
-    
+
     bytes = tvb_captured_length_remaining(tvb, 0);
 
     if (bytes < SEQUENCED_UNIT_HEADER_LEN) {
@@ -1551,7 +1659,7 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gboolean
                must be malformed data. */
             return offset;
         }
-        
+
         item = proto_tree_add_protocol_format(
                 tree, proto_mcastpitch, tvb,
                 0,
@@ -1569,11 +1677,11 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gboolean
 
         col_add_fstr(pinfo->cinfo, COL_INFO, "MC PITCH (%u message%s)", hdr_count, plurality(hdr_count, "", "s"));
     }
-                
+
     mcastpitch_tree = proto_item_add_subtree(item, ett_mcastpitch);
 
     col_set_str(pinfo->cinfo, COL_PROTOCOL, "MCPITCH");
-    
+
     /* header */
     proto_tree_add_item(mcastpitch_tree, hf_mcastpitch_hdr_length,   tvb, 0, 2, TRUE);
     proto_tree_add_item(mcastpitch_tree, hf_mcastpitch_hdr_count,    tvb, 2, 1, TRUE);
@@ -1587,7 +1695,7 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gboolean
             expert_add_info_format(pinfo, sequence_item, &ei_mcastpitch_out_of_sequence,
                 "Out-of-sequence, expected: %u, actual: %u", mcpa->fd->expected_sequence, hdr_sequence);
         }
-    }  
+    }
 
     /* messages (if any) */
     offset = SEQUENCED_UNIT_HEADER_LEN;
@@ -1618,7 +1726,7 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gboolean
             case 0x04:
                 result = dissect_gap_response_message(tvb, tree, &offset);
                 break;
-                
+
             case 0x20:
                 result = dissect_time_message(tvb, tree, &offset);
                 break;
@@ -1668,7 +1776,7 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gboolean
                 break;
 
             case 0x41:
-                result = dissect_trade_long_eu_message(tvb, tree, &offset);
+                result = dissect_trade_long_eu_message(tvb, tree, msg_length, &offset);
                 break;
 
             case 0x2B:
@@ -1686,7 +1794,7 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gboolean
             case 0x2E:
                 result = dissect_symbol_mapping_message(tvb, tree, &offset);
                 break;
-                
+
             case 0x2F:
                 result = dissect_add_order_expanded_message(tvb, tree, msg_length, &offset);
                 break;
@@ -1700,11 +1808,15 @@ dissect_mcastpitch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gboolean
                 break;
 
             case 0x32:
-                result = dissect_trade_report_message(tvb, tree, &offset);
+                result = dissect_trade_report_message(tvb, tree, msg_length, &offset);
                 break;
 
             case 0x34:
                 result = dissect_statistics_message(tvb, tree, &offset);
+                break;
+
+            case 0x35:
+                result = dissect_trade_unknown_message(tvb, tree, msg_length, &offset);
                 break;
 
             case 0x80:
@@ -1808,6 +1920,7 @@ proto_register_mcastpitch(void)
         { &hf_mcastpitch_long_canceled_shares,     { "Canceled Shares (Long)",   "mcastpitch.canceled_shares",          FT_UINT32, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_short_canceled_shares,    { "Canceled Shares (Short)",  "mcastpitch.canceled_shares",          FT_UINT16, BASE_DEC,     NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_symbol8,                  { "Symbol",                   "mcastpitch.symbol",                   FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
+        { &hf_mcastpitch_symbol_isin,              { "ISIN Symbol",              "mcastpitch.symbol_isin",              FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_add_flags,                { "Add Flags",                "mcastpitch.add_flags",                FT_UINT8,  BASE_HEX,     NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_osi_symbol,               { "OSI Symbol",               "mcastpitch.osi_symbol",               FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_session_sub_id,           { "Session Sub ID",           "mcastpitch.session_sub_id",           FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
@@ -1819,7 +1932,7 @@ proto_register_mcastpitch(void)
         { &hf_mcastpitch_trading_status,           { "Trading Status",           "mcastpitch.trading_status",           FT_UINT8,  BASE_DEC,     trading_status,                    0x0, NULL, HFILL } },
         { &hf_mcastpitch_reg_sho_action,           { "Reg SHO Action",           "mcastpitch.reg_sho_action",           FT_UINT8,  BASE_HEX,     reg_sho_action,                    0x0, NULL, HFILL } },
         { &hf_mcastpitch_retail_price_improvement, { "Retail Price Improvement", "mcastpitch.retail_price_improvement", FT_UINT8,  BASE_HEX,     retail_price_improvement,          0x0, NULL, HFILL } },
-        { &hf_mcastpitch_reserved1,                { "Reserved 1",               "mcastpitch.reserved1",                FT_UINT8,  BASE_HEX,     NULL,                              0x0, NULL, HFILL } }, 
+        { &hf_mcastpitch_reserved1,                { "Reserved 1",               "mcastpitch.reserved1",                FT_UINT8,  BASE_HEX,     NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_reserved2,                { "Reserved 2",               "mcastpitch.reserved2",                FT_UINT8,  BASE_HEX,     NULL,                              0x0, NULL, HFILL } },
         { &hf_mcastpitch_auction_type,             { "Auction Type",             "mcastpitch.auction_type",             FT_UINT8,  BASE_HEX,     auction_type,                      0x0, NULL, HFILL } },
         { &hf_mcastpitch_reference_price,          { "Reference Price",          "mcastpitch.reference_price",          FT_STRING, BASE_NONE,    NULL,                              0x0, NULL, HFILL } },
@@ -1870,9 +1983,9 @@ proto_register_mcastpitch(void)
     static ei_register_info ei[] = {
         { &ei_mcastpitch_out_of_sequence, { "mcastpitch.out_of_sequence", PI_SEQUENCE, PI_WARN, "Out-of-sequence", EXPFILL }},
     };
-        
+
     expert_module_t *expert_mcastpitch;
-        
+
     proto_mcastpitch = proto_register_protocol(
             "Multicast PITCH",      /* name */
             "BATS Multicast PITCH", /* short name */
@@ -1900,7 +2013,7 @@ proto_register_mcastpitch(void)
     /* --------------------------------------------------------------------------------
      * BZX Market
      * -------------------------------------------------------------------------------- */
-    
+
     /* NJ2 - BZX - GIG A - Realtime */
     add_ip_name_from_string("224.0.62.2",  "mcpitch.nj2.u1.u4.rt.za");
     add_ip_name_from_string("224.0.62.4",  "mcpitch.nj2.u5.u8.rt.za");
@@ -2268,7 +2381,7 @@ proto_register_mcastpitch(void)
     /* --------------------------------------------------------------------------------
      * EDGA Market
      * -------------------------------------------------------------------------------- */
-    
+
     /* NY5 - EDGA - GIG A - Realtime */
     add_ip_name_from_string("224.0.130.0", "mcpitch.ny5.u1.u4.rt.aa");
     add_ip_name_from_string("224.0.130.1", "mcpitch.ny5.u5.u8.rt.aa");
@@ -2372,7 +2485,7 @@ proto_register_mcastpitch(void)
     /* --------------------------------------------------------------------------------
      * EDGX Market
      * -------------------------------------------------------------------------------- */
-    
+
     /* NY5 - EDGX - GIG A - Realtime */
     add_ip_name_from_string("224.0.130.64", "mcpitch.ny5.u1.u4.rt.xa");
     add_ip_name_from_string("224.0.130.65", "mcpitch.ny5.u5.u8.rt.xa");
@@ -2476,7 +2589,7 @@ proto_register_mcastpitch(void)
     /* --------------------------------------------------------------------------------
      * BZX Options Market
      * -------------------------------------------------------------------------------- */
-    
+
     /* NJ2 - BZX Options - GIG A - Realtime */
     add_ip_name_from_string("224.0.62.96",  "mcpitch.nj2.u1.u4.rt.oa");
     add_ip_name_from_string("224.0.62.98",  "mcpitch.nj2.u5.u8.rt.oa");
